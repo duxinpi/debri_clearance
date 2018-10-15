@@ -15,10 +15,8 @@ public class Edge {
 
 
     private Resource DL_ij = new Resource();
-    public void init(){
-        DL_ij.put(1, 10); // truck.
-        DL_ij.put(2, 10); // bricks.
-    }
+
+
 
     private double FC_ij;
 
@@ -26,13 +24,27 @@ public class Edge {
 
     private Map<Integer, Double> beta;
 
+    private double R;
+
+    private double T;
 
 
-    public Edge(int i, int j, Resource DL_ij, double FC_ij) {
+
+    public Edge(int i, int j, Resource DL_ij, double FC_ij, double T, double R) {
         this.i  = i;
         this.j = j;
         this.DL_ij = DL_ij;
         this.FC_ij =FC_ij;
+        this.T = T;
+        this.R = R;
+    }
+
+    public int getI(){
+        return i;
+    }
+
+    public int getJ() {
+        return j;
     }
 
 
@@ -47,5 +59,21 @@ public class Edge {
 
     public void setDL(Resource DL) {
         this.DL_ij = DL;
+    }
+
+    public double getT() {
+        return T;
+    }
+
+    public void setT(double t) {
+        T = t;
+    }
+
+    public double getR() {
+        return R;
+    }
+
+    public void setR(double r) {
+        R = r;
     }
 }

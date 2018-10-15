@@ -4,7 +4,7 @@ import ilog.concert.IloException;
 import ilog.concert.IloLinearNumExpr;
 import ilog.concert.IloNumVar;
 import ilog.cplex.IloCplex;
-import sun.lwawt.macosx.CPlatformLWView;
+
 
 public class LPExample {
 
@@ -19,6 +19,7 @@ public class LPExample {
     public static void exampleModule() {
 
         IloCplex cplex = null;
+
         try {
             cplex = new IloCplex();
             // variable
@@ -48,14 +49,17 @@ public class LPExample {
 
 
 
+
         } catch (IloException e) {
             e.printStackTrace();
         }
 
     }
 
-    public static void main(String args[]) {
+    public static void main(String args[]) throws Exception {
         exampleModule();
+
+
 
     }
 

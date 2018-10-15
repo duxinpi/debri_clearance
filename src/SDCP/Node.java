@@ -10,46 +10,65 @@ public class Node {
     private Resource rs; // supply capacity;
     private Resource rd; // demand resource
 
-    private Resource b;  // benefit accrued
+//    private Resource b;  // benefit accrued
 
-    public Node(int id, String type, Resource rs, Resource rd) {
+    private double mu =0; // average rate that service the node.
+
+    private double lamda =0; // arrival rate at node.
+
+    private double []R0 = new double[30];  //todo: remove constant
+
+
+
+
+
+
+    private double Yt;
+    private double RS;
+    private double RD;
+    private double B;
+
+
+    public Node(int id, String type, double RS, double RD, double mu, double lamda, double Yt, double B) {
         this.id = id;
         this.type = type;
-        this.rs = rs;
-        this.rd = rd;
+        this.RS = RS;
+        this.RD = RD;
+        this.mu = mu;
+        this.lamda = lamda;
+        this.Yt = Yt;
+        this.B = B;
     }
 
-    public int getName() {
+
+
+    public int getId() {
         return id;
     }
 
-    public void setName(int name) {
+    public void setId(int name) {
         this.id = name;
     }
 
 
-    public Resource getRs() {
-        return rs;
+    public double getRs() {
+        return RS;
     }
 
-    public void setRs(Resource rs) {
-        this.rs = rs;
-    }
-
-    public Resource getRd() {
-        return rd;
+   public double getRd() {
+        return RD;
     }
 
     public void setRd(Resource rd) {
         this.rd = rd;
     }
 
-    public Resource getB() {
-        return b;
+    public double getB() {
+        return B;
     }
 
-    public void setB(Resource b) {
-        this.b = b;
+    public void setB(double b) {
+        this.B = b;
     }
 
     public String getType() {
@@ -61,7 +80,38 @@ public class Node {
     }
     @Override
     public String toString() {
-        return (" " + id + type + " ->");
+        return (" " + id + type + " ");
     }
 
+    public double getMu() {
+        return mu;
+    }
+
+    public void setMu(double mu) {
+        this.mu = mu;
+    }
+
+    public double getLamda() {
+        return lamda;
+    }
+
+    public void setLamda(double lamda) {
+        this.lamda = lamda;
+    }
+
+    public void setR0(double []R0) {
+        this.R0 = R0;
+    }
+
+    public double[] getR0() {
+        return R0;
+    }
+
+    public double getYt() {
+        return Yt;
+    }
+
+    public void setYt(double yt) {
+        Yt = yt;
+    }
 }
