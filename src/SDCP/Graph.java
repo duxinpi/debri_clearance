@@ -238,6 +238,7 @@ Tij
             result[edge.getI()-1][edge.getJ()-1] = edge.getR();
             result[edge.getJ()-1][edge.getI()-1] = edge.getR();
             result[edge.getI()-1][edge.getI()-1] = 999; // why?
+            result[edge.getJ()-1][edge.getJ()-1] = 999; // why?
         }
         return result;
     }

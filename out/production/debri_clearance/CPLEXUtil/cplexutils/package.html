@@ -1,0 +1,126 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+  <head>
+  </head>
+  <body bgcolor="white">
+    <a name="doc.Description"></a>
+    <p>This package provides classes to facilitate the setting of user-specified
+    parameters for CPLEX and CPOptimizer solvers.</p>
+
+    <div align="center">
+      <a href="#doc.Intro">[Introduction]</a>
+      <a href="#doc.Usage">[Usage]</a>
+      <a href="#doc.RelatedDocumentation">[Related Documentation]</a>
+    </div>
+
+    <a name="doc.Introduction"></a>
+    <h2>Introduction</h2>
+    <a href="#doc.Description">[Description]</a>
+    <p>
+      An instance of <b>CplexParameterSetter</b> can be used to set 
+      user-specified values for one or more CPLEX parameters in one or more
+      CPLEX solvers (instances of <tt>ilog.cplex.IloCplex</tt>).
+    </p>
+    <p>
+      Similarly, an instance of <b>CPOptimizerParameterSetter</b> can be used
+      to set user-specified values for one or more CPOptimizer parameters in
+      one or more CPOptimizer solvers (instances of <tt>ilog.cp.IloCP</tt>).
+    </p>
+    <p>
+      <b>OptionsCatalog</b> provides a mechanism for cataloging parameters
+      for the linked version of either solver (CPLEX or CPOptimizer).
+    </p>
+    <p>
+      <b>AmibiguousParameterException</b>, <b>NullArgumentException</b> and
+      <b>UknownParameterException</b> are custom exception classes for
+      pathologies that may arise in the use of the setter classes.
+    </p>
+    <p>
+      The static method <b>CPDisplay.asString()</b> can be used to
+      produce a listing of a CPOptimizer model. To enhance readability, the
+      user should assign labels (names) to all variables and constraints,
+      using the optional name field in the constructor for variables or the
+      <tt>IloAddable.setName()</tt> method (for both variables and constraints).
+    </p>
+
+    <a name="doc.Usage"></a>
+    <h2>Usage</h2>
+    <a href="#doc.Description">[Description]</a>
+    <p>
+      The package is intended for use in a program that allows the user to
+      specify parameter values either through the program's command line
+      arguments or through an interactive interface. Either use case precludes
+      "hard-coding" the parameter values in the source code, which is where
+      this package comes in.
+    </p>
+    <p>
+      Parameter names and parameter values are passed to the setter instance
+      as strings; the setter handles conversion of the values to the type
+      required for the specified parameter. Parameter names are
+      case-insensitive. The full class hierarchy of the parameter can be given,
+      but is not necessary. The user need only specify enough of the hierarchy
+      to resolve any potential ambiguity. Thus (as of CPLEX 12.6),
+      <tt>IloCplex.Param.Read.Scale</tt> can be specified as 
+      "IloCplex.Param.Read.Scale", "Param.Read.Scale", "Read.Scale" or simply
+      "Scale", but the minimum necessary to specify 
+      <tt>IloCplex.Param.MIP.Display</tt> is "MIP.Display", since "Display"
+      could refer to any of seven different parameters.
+    </p>
+    <p>
+      The following example shows how to use both setter classes (with imports
+      and try-catch blocks omitted).
+    </p>
+    <pre>
+      // create solver instances
+      IloCplex cplex = new IloCplex();
+      IloCP cp = new IloCP();
+
+      // create parameter setter instances
+      CplexParameterSetter csetter = new CplexParameterSetter();
+      CPOptimizerParameterSetter cpsetter = new CPOptimizerParameterSetter();
+
+      // parameter names (would normally come from command line or GUI)
+      String[] cplexNames =
+        new String[] {"TimeLimit", "Limits.Solutions", "Presolve"};
+      String[]  cpNames = new String[] {"TimeLimit", LogVerbosity"};
+
+      // parameter values  (would normally come from command line or GUI)
+      String[] cplexValues = new String[] {"23.5", "1000", "false"};
+      String[] cpValues = new String[] {"23.5", 1};
+
+      // set the CPLEX parameters
+      for (int i = 0; i &lt; cplexNames.length; i++) {
+         csetter.set(cplex, cplexNames[i], cplexValues[i]);
+      }
+
+      // set the CPOptimizer parameters
+      for (int i = 0; i &lt; cpNames.length; i++) {
+        cpsetter.set(cp, cpNames[i], cpValues[i]);
+      }      
+    </pre>
+    <p>
+      To use either <b>CplexParameterSetter</b> or
+      <b>CPOptimizerParameterSetter</b>, the corresponding jar file
+      (<tt>cplex.jar</tt> or <tt>ILOG.CP.jar</tt> respectively) needs to
+      be on the class path at compilation time, and the corresponding
+      platform-specific binary file needs to be on library path (either
+      by adding it to <tt>-Djava.library.path=...</tt> on the command line or
+      by adding it to the <tt>LD_LIBRARY_PATH</tt> environment variable). If
+      you are only going to use one type of setter (for instance,
+      <b>CplexParameterSetter</b> but not <b>CPOptimizerParameterSetter</b>),
+      you do not need to link either the jar file or the binary file for the
+      unused solver.
+    </p>
+
+    <a name="doc.RelatedDocumentation"></a>
+    <h2>Related Documentation</h2>
+    <a href="#doc.Description">[Description]</a>
+    <p>
+      For a list of parameters and appropriate values for either class of
+      solver, please see the IBM documentation for the solver.
+    </p>
+
+    <!-- Put @see and @since tags down here. -->
+
+  </body>
+</html>

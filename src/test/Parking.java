@@ -64,7 +64,6 @@ public class Parking {
                 for(int i = 0; i < n; i++) {
                     IloLinearNumExpr constraint1 = model.linearNumExpr();
                     for(int j = 0; j < m; j++) {
-
                         constraint1.addTerm(interval[j][s], x[i][j]);
                     }
                     model.addLe(constraint1, capacity[i][s]*available[i][s]);

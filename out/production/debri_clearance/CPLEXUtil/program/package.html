@@ -1,0 +1,45 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+  <head>
+  </head>
+  <body bgcolor="white">
+    <a name="doc.Description"></a>
+    <p>This package provides a main program that catalogs and lists the
+      parameters for the linked versions of CPLEX and CPOptimizer.</p>
+
+    <div align="center">
+      <a href="#doc.Intro">[Introduction]</a>
+      <a href="#doc.Usage">[Usage]</a>
+    </div>
+
+    <a name="doc.Introduction"></a>
+    <h2>Introduction</h2>
+    <p>
+      <b>CatalogParameters</b> does not contain code for setting solver
+      parameters. It simply scans the linked solver libraries and outputs an
+      alphabetic list of recognized parameters for each solver. Among other
+      things, this provides a way to recognize when parameter names (e.g.,
+      "Display") are ambiguous and how much is needed to disambiguate them.
+    </p>
+
+    <a name="doc.Usage"></a>
+    <h2>Usage</h2>
+    <p>
+      To run the program, execute the following:
+    </p>
+    <center>
+      <tt>
+        java -classpath 
+        .:&lt;path to CPLEX&gt;/cplex.jar:&lt;path to 
+        CPOptimizer&gt;/ILOG.CP.jar:CPLEXUtils.jar
+        program.CatalogParameters
+      </tt>
+    </center>
+    <p>
+      The program requires that the appropriate binary files for CPLEX
+      and CPOptimizer be on the library path. They can be specified either by
+      adding <tt>-Djava.library.path=...</tt> to the command line or by adding 
+      their paths to the <tt>LD_LIBRARY_PATH</tt> environment variable.
+    </p>
+  </body>
+</html>
