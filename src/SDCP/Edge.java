@@ -11,7 +11,8 @@ public class Edge {
 
 
 
-    private Resource W_ij; //required resource
+    public double[] W_ij; //required resource
+    public double[] beta; //required resource
 
 
     private Resource DL_ij = new Resource();
@@ -22,21 +23,26 @@ public class Edge {
 
     private double f_ij;
 
-    private Map<Integer, Double> beta;
 
     private double R;
 
     private double T;
 
 
+    public Edge(int i, int j) {
+        this.i = i;
+        this.j = j;
+    }
 
-    public Edge(int i, int j, Resource DL_ij, double FC_ij, double T, double R) {
+    public Edge(int i, int j, Resource DL_ij, double FC_ij, double T, double R, double[] W, double []beta) {
         this.i  = i;
         this.j = j;
         this.DL_ij = DL_ij;
         this.FC_ij =FC_ij;
         this.T = T;
         this.R = R;
+        this.W_ij = W;
+        this.beta = beta;
     }
 
     public int getI(){
@@ -76,4 +82,5 @@ public class Edge {
     public void setR(double r) {
         R = r;
     }
+
 }

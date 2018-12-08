@@ -1,42 +1,42 @@
 package SDCP;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Node {
 
 
     private int id;
+    private  double B ;
 
     private String type; //1 s, , 2 t, 3 d
 
-    private Resource rs; // supply capacity;
-    private Resource rd; // demand resource
+    private Map<Integer, Double> Yt = new HashMap<>();
+    private Map<Integer, Double> RS = new HashMap<>();
+    private Map<Integer, Double> RD = new HashMap<>();
+    private Map<Integer, Double> lamda = new HashMap<>(); // arrival rate at node.
+
 
 //    private Resource b;  // benefit accrued
 
-    private double mu =0; // average rate that service the node.
-
-    private double lamda =0; // arrival rate at node.
-
-    private double []R0 = new double[30];  //todo: remove constant
+    private double mu = 0; // average rate that service the node.
 
 
 
+    private double[] R0 = new double[30];  //todo: remove constant
 
 
 
-    private double Yt;
-    private double RS;
-    private double RD;
-    private double B;
 
 
     public Node(int id, String type, double RS, double RD, double mu, double lamda, double Yt, double B) {
         this.id = id;
         this.type = type;
-        this.RS = RS;
-        this.RD = RD;
+        this.RS.put(0, RS);
+        this.RD.put(0,RD);
         this.mu = mu;
-        this.lamda = lamda;
-        this.Yt = Yt;
+        this.lamda.put(0, lamda);
+        this.Yt.put(0, Yt);
         this.B = B;
     }
 
@@ -51,17 +51,22 @@ public class Node {
     }
 
 
-    public double getRs() {
-        return RS;
+    public double getRs(int t) {
+        return RS.get(t);
     }
 
-   public double getRd() {
-        return RD;
+    public double getRd(int t) {
+        return RD.get(t);
     }
 
-    public void setRd(Resource rd) {
-        this.rd = rd;
+    public void setRS(int t, double value) {
+        this.RS.put(t, value);
     }
+
+    public void setRD(int t, double value) {
+        this.RD.put(t, value);
+    }
+
 
     public double getB() {
         return B;
@@ -91,15 +96,12 @@ public class Node {
         this.mu = mu;
     }
 
-    public double getLamda() {
-        return lamda;
+    public double getLamda(int t) {
+        return lamda.get(t);
     }
 
-    public void setLamda(double lamda) {
-        this.lamda = lamda;
-    }
 
-    public void setR0(double []R0) {
+    public void setR0( double []R0) {
         this.R0 = R0;
     }
 
@@ -107,11 +109,9 @@ public class Node {
         return R0;
     }
 
-    public double getYt() {
-        return Yt;
+    public double getYt(int t) {
+        return Yt.get(t);
     }
 
-    public void setYt(double yt) {
-        Yt = yt;
-    }
+
 }

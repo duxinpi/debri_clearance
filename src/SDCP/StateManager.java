@@ -1,18 +1,12 @@
 package SDCP;
 
-import java.util.List;
+import java.util.HashMap;
 
-public class StateManager {
+public class StateManager extends HashMap<Integer, BState>{
     private static StateManager stateManager;
-    List<Node> N;
-    List<Edge> E;
-
-
-    List<Edge> edges;
 
 
     private StateManager() {
-
     }
 
     public synchronized static StateManager getInstance() {
@@ -21,6 +15,4 @@ public class StateManager {
         }
         return stateManager;
     }
-
-
 }

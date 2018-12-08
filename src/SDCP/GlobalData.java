@@ -6,5 +6,4 @@ public class GlobalData {
     public static double B = 3;
     public static double SIGMA = 0.2;
 
-
 }
