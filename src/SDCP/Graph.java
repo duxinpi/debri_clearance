@@ -1,11 +1,11 @@
 package SDCP;
 
+import com.sun.media.jfxmedia.logging.Logger;
 import ilog.concert.IloException;
 
 import java.util.*;
 
-import static SDCP.Utility.getWSum;
-import static SDCP.Utility.getZ;
+import static SDCP.Utility.*;
 
 
 public class Graph {
@@ -13,10 +13,6 @@ public class Graph {
     private List<Node> N;
 
 
-    List<Resource> Wt = new ArrayList<>(); // amount of resource required to clear all.
-
-    List<Resource> RS_t = new ArrayList<>(); //
-    List<Resource> RD_t = new ArrayList<>();
 
     List<List<Edge>> B = new ArrayList<>();
     List<List<Edge>> UPrime = new ArrayList<>();
@@ -25,7 +21,6 @@ public class Graph {
     List<List<Edge>> RB = new ArrayList<>();
     double kt = 3; // how do i know this is rational number? TODO: xdu
 
-    List<Map<Integer, Double>> Yt;
 
     public void initBlocked() {
         double[][] T = getPeriodT();
@@ -46,25 +41,23 @@ public class Graph {
     }
 
     public void initRB() {
-        RB.add(UPrime.get(0));
+       return;
     }
 
-    public void initUPrime() {
+    public void initUB() {
+        UB.add(E);
+    }
+    public void initUPrime(List<Edge> edges, int t) {
+         UPrime.add(t, edges);
+        List<Edge> neibours = findAllNeigbours(edges, getUB(t));
+         UPrime.add(t+1,Utility.exclude(neibours, edges));
 
+    }
+    public void setUPrime(List<Edge> edges, int t) {
+        UPrime.set(t, edges);
+        List<Edge> neibours = findAllNeigbours(edges, getUB(t));
+        UPrime.set(t+1,Utility.exclude(neibours, edges));
 
-        List<Edge> list1 = new ArrayList<>();
-        list1.add(new Edge(4,3));
-     /*   list1.add(new Edge(5,6));
-        list1.add(new Edge(6,7));*/
-
-        UPrime.add(list1);
-        Edge e2 = new Edge(4, 5);
-        List<Edge> list2 = new ArrayList<>();
-        list2.add(e2);
-        UPrime.add(list2);
-        List<Edge> list3 = new ArrayList<>();
-        list3.add(new Edge(5, 7));
-        UPrime.add(list3);
     }
 
     public List<Edge> getU(int t) {
@@ -78,37 +71,43 @@ public class Graph {
     }
 
     public List<Edge> getRB(int t) {
-        if (t == 0) return UPrime.get(0);
+        if (t == 0) return getUPrime(null,0);
         List<Edge> result = Utility.exclude(getEPrimePrime(t), getEPrime(t));
         return result;
     }
 
-    public double getRCt(int t){
+    public double getRCt(int t, int level){
         if (t ==0) {
-            return getKt(0);
+            return getKt(0, level);
         }
-        return Math.max(getKt(t) - getGarma(t-1), 0);
+        return Math.max(getKt(t, level) - getGarma(t-1, level), 0);
     }
 
-    public double getGarma(int t){
+    public double getGarma(int t, int level){
         if (t==0) return 0;
-        double Wsum = getWSum(getEPrime(t));
-        double Wsum2 = getWSum(getEPrimePrime(t));
-        double RCt = getRCt(t);
+        double Wsum = getWSum(getEPrime(t), t, level);
+        double Wsum2 = getWSum(getEPrimePrime(t), t, level);
+        double RCt = getRCt(t, level);
         if (RCt > Wsum) return 0;
-        if (RCt ==0) return getGarma(t-1) - getKt(t);
+        if (RCt ==0) return getGarma(t-1, level) - getKt(t,level);
         return Wsum2 - RCt;
     }
 
 
 
     public List<Edge> getUB(int t) {
-        return Utility.exclude(B.get(t), RB.get(t));
+        return Utility.exclude(getB(t), getRB(t));
     }
 
     public List<Edge> getEPrime(int t) {
-        return UPrime.get(t);
+        return getU(t);
     }
+
+    public List<Edge> getEprimeOnA(List<Edge> actions) {
+        return actions;
+    }
+
+
 
     public List<Edge> getEPrimePrime(int t) {
         List<Edge> ePrime = getEPrime(t);
@@ -127,7 +126,7 @@ public class Graph {
     }
 
 
-    public List<Edge> getUPrime(int t) {
+    public List<Edge> getUPrime(List<Edge>observation, int t) {
         return UPrime.get(t);
     }
 
@@ -152,19 +151,13 @@ public class Graph {
     }
 
 
-    private Resource RC_t; // total of clearance capacity
-
-    private Resource r_t;  //
 
 
     public void initNodes() {
         N = new ArrayList<>();
-        RS_t = new ArrayList<>();
-        RD_t = new ArrayList<>();
         Resource resource1 = new Resource();
         resource1.put(1, 10);
         resource1.put(2, 100);
-        RD_t.add(resource1);
 
         Node d1 = new Node(1, "d", 0, 200, 0, 0, 0, 56);
         N.add(d1);
@@ -182,7 +175,6 @@ public class Graph {
         Resource resource4 = new Resource();
         resource4.put(1, 10);
         resource4.put(2, 100);
-        RS_t.add(resource4);
         Node s4 = new Node(4, "s", 300, 0, 20.64, 3.30, 1, 0);
         String r0N4 = "0.64\t3.68\t7.31\t11.19\t15.22\t19.36\t0.64\t3.68\t7.31\t11.19\t15.22\t19.36\t0.64\t3.68\t7.31\t11.19\t15.22\t19.36\t0.64\t3.68\t7.31\t11.19\t15.22\t19.36\t0.64\t3.68\t7.31\t11.19\t15.22\t19.36";
         s4.setR0(converStringToArray(r0N4));
@@ -195,7 +187,6 @@ public class Graph {
         Node s5 = new Node(5, "s", 200, 0, 21.75, 4.78, 1, 0);
         String r0N5 = "1.16\t4.38\t8.07\t11.99\t16.04\t20.19\t1.16\t4.38\t8.07\t11.99\t16.04\t20.19\t1.16\t4.38\t8.07\t11.99\t16.04\t20.19\t1.16\t4.38\t8.07\t11.99\t16.04\t20.19\t1.16\t4.38\t8.07\t11.99\t16.04\t20.19";
         s5.setR0(converStringToArray(r0N5));
-        RS_t.add(resource5);
         N.add(s5);
 
 
@@ -210,7 +201,8 @@ public class Graph {
         d7.setR0(converStringToArray(r0N7));
         N.add(d7);
 
-        System.out.println(N);
+      //
+        //  System.out.println(N);
 
     }
 /*
@@ -239,7 +231,6 @@ Tij
         Resource DL35 = new Resource();
         DL35.put(1, 10);
         DL35.put(2, 10);
-        Wt.add(DL35);
         Edge edge35 = new Edge(3, 5, DL35, 100, 1.26, 0.03, new double[]{0.5, 0.3}, new double[]{0.5, 0.5});
 
         E.add(edge35);
@@ -247,88 +238,92 @@ Tij
         Resource DL36 = new Resource();
         DL36.put(1, 10);
         DL36.put(2, 10);
-        Wt.add(DL36);
         Edge edge36 = new Edge(3, 6, DL36, 100, 0.63, 0.04, new double[]{0.2, 0.3}, new double[]{0.5, 0.5});
 
         E.add(edge36);
         Resource DL37 = new Resource();
         DL37.put(1, 10);
         DL37.put(2, 10);
-        Wt.add(DL37);
         Edge edge37 = new Edge(3, 7, DL37, 100, 0.94, 0.04, new double[]{0.2, 0.3} ,new double[]{0.5, 0.5});
         E.add(edge37);
 
 
         Resource DL45 = new Resource();
-        Wt.add(DL45);
         Edge edge45 = new Edge(4, 5, DL45, 100, 0.77, 0.02, new double[]{0.6, 0.3},new double[]{0.5, 0.5});
         E.add(edge45);
 
         Resource DL46 = new Resource();
         DL46.put(1, 10);
         DL46.put(2, 10);
-        Wt.add(DL46);
         Edge edge46 = new Edge(4, 6, DL46, 100, 1.47, 0.07, new double[]{0.2, 0.3},new double[]{0.5, 0.5});
         E.add(edge46);
 
         Resource DL47 = new Resource();
         DL47.put(1, 10);
         DL47.put(2, 10);
-        Wt.add(DL47);
         Edge edge47 = new Edge(4, 7, DL47, 100, 1.26, 0.04, new double[]{0.2, 0.3},new double[]{0.5, 0.5});
         E.add(edge47);
 
         Resource DL56 = new Resource();
         DL56.put(1, 10);
         DL56.put(2, 10);
-        Wt.add(DL56);
         Edge edge56 = new Edge(5, 6, DL56, 100, 0.95, 0.07, new double[]{1.2, 0.3},new double[]{0.5, 0.5});
         E.add(edge56);
 
         Resource DL57 = new Resource();
         DL57.put(1, 10);
         DL57.put(2, 10);
-        Wt.add(DL57);
         Edge edge57 = new Edge(5, 7, DL57, 100, 1.47, 0.07, new double[]{0.2, 0.9},new double[]{0.5, 0.5});
         E.add(edge57);
 
         Resource DL67 = new Resource();
-        Wt.add(DL67);
         Edge edge67 = new Edge(6, 7, DL67, 100, 0.63, 0.03, new double[]{0.2, 0.8},new double[]{0.5, 0.5});
         E.add(edge67);
     }
 
-    public double[][] getW() {
+    public double[][] getW(int t) {
         double[][] result = new double[E.size()][E.size()];
         for (Edge each : E) {
-            result[each.getI()][each.getJ()] = each.W_ij[0]+ each.W_ij[1] ;
+            result[each.getI()][each.getJ()] = each.W_ij.get(t)[0]+ each.W_ij.get(t)[1];
         }
         return result;
     }
 
-    public double[][] getbeta(){
+    public double[][] getbeta(int t, int level){
         double[][] result = new double[E.size()][E.size()];
         for (Edge each : E) {
-            result[each.getI()][each.getJ()] = each.beta[0];
+            result[each.getI()][each.getJ()] = each.beta.get(t)[level];
         }
         return result;
     }
 
-
-    public double[][] getWmin() {
-        double[][] result = new double[E.size()][E.size()];
-        for (Edge each : E) {
-            result[each.getI()][each.getJ()] = Math.min(each.W_ij[0], each.W_ij[1]);
+    public void updateBeta(int t){
+        if (t==0) {
+            return ;
         }
-        return result;
+        for (Edge edge : E) {
+            double[] previousBeta = edge.beta.get(t-1);
+            double[] newBeta = new double[2];
+            if (Utility.contains(getUB(t), edge)){
+                    newBeta = previousBeta;
+            } else if (Utility.contains(getRB(t), edge)){
+                newBeta[0] =1;
+                newBeta[1] =1;
+            }
+            edge.beta.add(newBeta);
+        }
+
     }
 
-    public double getKt(int t) {
+
+    public double getKt(int t, int level) {
         if (t==0){
-            return Utility.getSum(getW());
+            return 5;// TODO: xdu. kt should have multiple.
         }
-        return getKt(t-1) - getWSum(getUPrime(t));
+        return getKt(t-1, level) - getWSum(getEPrime(t), t, level);
     }
+
+
 
 
 
@@ -371,22 +366,22 @@ Tij
         return result;
     }
 
-    public void updateRS(int t, double[][] fij) {
+    public void updateRS(List<Edge> observation, int t, double[][] fij) {
         if (t==0) return;
 
         for (Node each : N) {
 
             double sum1 =0;
-            for (int j =0; j < N.size(); j++) {
-                if (Utility.Match(getUPrime(t), each.getId(), j)){
-                    sum1+= fij[each.getId()][j];
+            for (int j =1; j <= N.size(); j++) {
+                if (Utility.Match(getUPrime(observation, t), each.getId(), j)){
+                    sum1+= fij[each.getId()-1][j-1];
                 }
             }
 
             double sum2 = 0;
-            for (int j =0; j < N.size(); j++) {
-                if (Utility.Match(getUPrime(t-1), j, each.getId())){
-                    sum2+= fij[j][each.getId()];
+            for (int j =1; j <= N.size(); j++) {
+                if (Utility.Match(getUPrime(observation,t-1), j, each.getId())){
+                    sum2+= fij[j-1][each.getId()-1];
                 }
             }
 
@@ -472,10 +467,11 @@ Tij
         for (int i = 0; i < temp.length; i++) {
             result[i] = Double.valueOf(temp[i]);
         }
-
         return result;
-
     }
+
+
+
 
     public double[] getBiArray() {
         double[] result = new double[N.size()];
@@ -513,26 +509,41 @@ Tij
 
    //feasible actions (2)
     public List<List<Edge>> getAllFeasibleActions(int t){
-        List<List<Edge>> actions = getAllActions( t);
-        double RCt = getRCt(t);
+        List<List<Edge>> actions = getAllActions(t);
         List<List<Edge>> result = new ArrayList<>();
         for (List<Edge> eachActions : actions) {
-            if (getWMinSum(eachActions)< RCt){
+            List<Edge> e = new ArrayList<>(eachActions);
+            List<Edge> temp = exclude(e, getEPrime(t));
+            if (isWminSumFeasible(temp, t)){
                 result.add(eachActions);
             }
         }
-
         return result;
+    }
+
+    public boolean isWminSumFeasible(List<Edge> edges, int t) {
+        double rct0 = getRCt(t, 0);
+        double rct1 = getRCt(t, 1);
+        for (Edge e : edges) {
+           if (e.W_ij.get(t)[0] > e.W_ij.get(t)[1]) {
+               rct1-= e.W_ij.get(t)[1];
+           } else {
+               rct0 -=e.W_ij.get(t)[0];
+           }
+            if (rct0 <=0 || rct1<=0) return false;
+        }
+        return true;
 
     }
 
-    public double getWMinSum(List<Edge> edges){
+    public double getWMinSum(List<Edge> edges, int t){
         double sum =0;
         for (Edge e : edges) {
-            sum+= Math.min(e.W_ij[0],e.W_ij[1]);
+            sum+= Math.min(e.W_ij.get(t)[0],e.W_ij.get(t)[1]);
         }
         return sum;
     }
+
 
 
 
@@ -540,6 +551,7 @@ Tij
         if (remain.size() ==0){
             return;
         }
+
         Edge edge = findAdjcentEdge(current,  remain);
         if (edge == null) return ;
         List<Edge> eachResult = new ArrayList<>(current);
@@ -553,7 +565,7 @@ Tij
 
    public Edge findAdjcentEdge(List<Edge> current, List<Edge> remaining) {
         for (Edge e: remaining) {
-            if (isAdjcent(current, e)) {
+            if (isAdjcent(current, e) ||  Utility.isSupply( e.getJ(), N) || Utility.isSupply( e.getI(), N)) {
                 return e;
             }
         }
@@ -562,15 +574,29 @@ Tij
 
 
 
+
+
+
    public boolean isAdjcent(Edge a, Edge b) {
         return a.getI() == b.getI() || a.getJ() == b.getI() || a.getJ() == b.getJ() || a.getI() == b.getJ();
    }
 
    public boolean isAdjcent(List<Edge> edges, Edge b){
+
         for (Edge a: edges) {
             if (isAdjcent(a, b))return true;
         }
         return false;
+   }
+
+   public List<Edge> getSupplies() {
+        Set<Edge> set = new HashSet<>();
+        for (Edge each: E) {
+            if( Utility.isSupply( each.getJ(), N) || Utility.isSupply( each.getI(), N)){
+                set.add(each);
+            }
+        }
+        return new ArrayList<>(set);
    }
 
    public Set<Integer> getNodes(List<Edge> edges) {
@@ -583,38 +609,62 @@ Tij
         return set;
    }
    //(4)
-   public double getPofObservation(List<Edge> observation, int obLevel) {
-        double sum =0;
+   public double getPofObservation(List<Edge> observation, int t, int level) {
+        double sum =1;
         for (Edge edge : observation) {
-            sum+= edge.beta[obLevel];
+            sum*= edge.beta.get(t)[level];
         }
         return sum;
    }
 
-    public List<Edge> getObservation(List<Edge> action) {
+    public List<List<Edge>> getObservation(List<Edge> action, int t) {
+        List<List<Edge>> result = new ArrayList<>();
 
-        Set<Integer> set = new HashSet<>();
-        for (Edge each : action) {
-            set.add(each.getI());
-            set.add(each.getI());
-        }
-        List<Edge> result = new ArrayList<>();
-        for (Edge each : E) {
-            if (set.contains(each.getI()) || set.contains(each.getJ())) {
-                result.add(each);
+        List<Edge> current = new ArrayList<>();
+        findAllCombination(action, result,   0, current);
+
+        for (List<Edge> eachSet: new ArrayList<>(result)) {
+            if (!eachSet.isEmpty()) {
+                result.add(findAllNeigbours(eachSet, getUB(t)));
             }
+
         }
-
-        //TODO: add logic
-
         return result;
     }
 
-    public double getReward(  int t, BState bState) throws IloException {
+    public List<Edge> findAllNeigbours(List<Edge> edges, List<Edge> edgesSet){
+            Set<Edge> result = new HashSet<>();
+            for (Edge edge: edgesSet){
+                if (isAdjcent(edges, edge)){
+                    result.add(edge);
+                }
+            }
+            result.addAll(edges);
 
+            return new ArrayList<>(result);
+    }
+
+
+
+    public void findAllCombination(List<Edge> action, List<List<Edge>>result,  int n, List<Edge> current) {
+        if (n == action.size()) {
+            List<Edge> newEdgesSet = new ArrayList<>(current);
+            result.add(newEdgesSet);
+            return ;
+        }
+        current.add(action.get(n));
+        findAllCombination(action, result,n+1, current);
+        current.remove(action.get(n));
+        findAllCombination(action, result,n+1, current);
+    }
+
+
+
+    public double getReward( List<Edge> observation,  int t, int level) throws IloException {
         double bi[] = getBiArray();
-        double[] rd = bState.RD_t;
-        double z = getZ(this, t);
+
+        double z = getZ(this, t, observation,level);
+        double[] rd = StateManager.getInstance().get(t).RD_t;
         double result = 0;
         for(Node d: getNd()){
             int i = d.getId() -1;
@@ -624,13 +674,50 @@ Tij
         return result;
     }
 
-    public double getER(int t, List<Edge> observation, int oblevel) throws IloException {
-        getZ(this, t);
-        BState bastate = StateManager.getInstance().get(t);
-        double result = getPofObservation(observation, oblevel) *getReward(t, bastate);
+    public double getER(int t, List<Edge> action, int level) throws IloException {
+
+        double result =0;
+        for (List<Edge> eachObservation : getObservation(action, t)){
+            result += getPofObservation(eachObservation, t, level) *getReward(eachObservation, t, level);
+
+        }
 
         return result;
     }
+
+
+    public double getBenefit(int t) throws IloException {
+        List<List<Edge>> allActions = getAllFeasibleActions(t);
+
+        double max =-1;
+        if (t==2) {
+            return 0;
+        }
+        for (List<Edge> action: allActions) {
+            initUPrime(action, t);
+            double er= getER(t, action,0 );
+            updateBeta(t+1);
+            updateLamda(t+1);
+            updateYt(t+1);
+            max = Math.max(max, er) + getBenefit(t+1);
+          //  System.out.println(action);
+           // System.out.println(max);
+        }
+        return max;
+    }
+
+    public void updateLamda(int t) {
+        for(Node each : N) {
+            each.lamda.put(t, each.getLamda(0));
+        }
+    }
+
+    public void updateYt(int t) {
+        for(Node each : N) {
+            each.Yt.put(t, each.getYt(0));
+        }
+    }
+
 
 
 
@@ -639,17 +726,22 @@ Tij
         Graph graph = new Graph();
         graph.initNodes();
         graph.initEdges();
-        graph.initUPrime();
         graph.initBlocked();
         graph.initUnblocked();
         graph.initRB();
-
+        graph.initUB();
+        long t_start =  System.currentTimeMillis();
+        System.out.println(System.currentTimeMillis());
+        System.out.print("test .........................................................");
+        System.out.println(graph.getAllFeasibleActions(0).size());
         try {
-            System.out.println(graph.getER( 0, graph.getObservation(graph.getUPrime(0)), 0));
+          //  System.out.print("test ...:"+ graph.getBenefit(0));
+            graph.getBenefit(0);
         } catch (IloException e) {
             e.printStackTrace();
         }
-
+        long t_end =  System.currentTimeMillis();
+        System.out.println("xdu: cost: " + (t_end-t_start));
 
     }
 

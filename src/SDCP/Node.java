@@ -11,10 +11,10 @@ public class Node {
 
     private String type; //1 s, , 2 t, 3 d
 
-    private Map<Integer, Double> Yt = new HashMap<>();
-    private Map<Integer, Double> RS = new HashMap<>();
-    private Map<Integer, Double> RD = new HashMap<>();
-    private Map<Integer, Double> lamda = new HashMap<>(); // arrival rate at node.
+    public Map<Integer, Double> Yt = new HashMap<>();
+    public Map<Integer, Double> RS = new HashMap<>();
+    public Map<Integer, Double> RD = new HashMap<>();
+    public Map<Integer, Double> lamda = new HashMap<>(); // arrival rate at node.
 
 
 //    private Resource b;  // benefit accrued
@@ -24,6 +24,7 @@ public class Node {
 
 
     private double[] R0 = new double[30];  //todo: remove constant
+    //todo: Yjt matlab update.
 
 
 

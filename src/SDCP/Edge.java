@@ -1,6 +1,8 @@
 package SDCP;
 
-import java.util.Map;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Edge {
     private int i;
@@ -11,8 +13,8 @@ public class Edge {
 
 
 
-    public double[] W_ij; //required resource
-    public double[] beta; //required resource
+    public List<double[]> W_ij = new ArrayList<>(); //required resource
+    public List<double[]> beta = new ArrayList<>(); //required resource
 
 
     private Resource DL_ij = new Resource();
@@ -41,8 +43,11 @@ public class Edge {
         this.FC_ij =FC_ij;
         this.T = T;
         this.R = R;
-        this.W_ij = W;
-        this.beta = beta;
+        this.W_ij.add(W);
+        this.W_ij.add(W);
+        this.W_ij.add(W);
+        this.W_ij.add(W);
+        this.beta.add(beta);
     }
 
     public int getI(){

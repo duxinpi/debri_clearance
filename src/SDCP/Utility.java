@@ -98,10 +98,10 @@ public class Utility {
         return sum;
     }
 
-    public static double getWSum(List<Edge> edges) {
+    public static double getWSum(List<Edge> edges, int t, int level) {
         double sum =0;
         for (Edge e : edges) {
-            sum+= e.W_ij[0]+ e.W_ij[1];
+            sum+= e.W_ij.get(t)[level];
         }
         return sum;
     }
@@ -131,6 +131,7 @@ public class Utility {
         for (int i =0; i < matlabA.length; i++) {
             for (int j =0; j < matlabA[0].length; j++) {
                 if (Math.abs(matlabA[i][j]- javaA[i][j]) >0.01){
+
                     System.out.println("file: " + file1 + "diff: " + i + "-----" + j + " : " + matlabA[i][j] +"----java---" + javaA[i][j]);
                 }
             }
@@ -295,7 +296,7 @@ public class Utility {
 
 
 
-    public static double getZ(Graph graph, int t) throws IloException {
+    public static double getZ(Graph graph, int t, List<Edge> observation, int level) throws IloException {
 
         int N = graph.getNsize();
         int nX = 0;
@@ -345,23 +346,23 @@ public class Utility {
             }
 
         }
-        printArray(f);
+       // printArray(f);
 
 
         // 1.2
         int row = 0;
-        System.out.println("1.2-----------------");
+      //  System.out.println("1.2-----------------");
         // row 1, 7
         for (Node i : graph.getNd()) {
 
             for (Node j : graph.getN()) {
                 int tempColumn = nF + (j.getId() - 1) * N + i.getId();
                 int tempColumn2 = nF + (j.getId() - 1) * N + j.getId();
-                if (Match(graph.getUPrime(t), j.getId(), i.getId())) {
+                if (Match(graph.getUPrime(observation, t), j.getId(), i.getId())) {
                     //     System.out.println("line number: row +i.getId() - 1 positive: " + (i.getId() - 1));
                     Aeq[i.getId() - 1][tempColumn - 1] = 1;
                 }
-                if (Match(graph.getUPrime(t), i.getId(), j.getId())) {
+                if (Match(graph.getUPrime(observation, t), i.getId(), j.getId())) {
                     //             System.out.println("line number: row +i.getId() - 1 positive1: " + (i.getId() - 1));
                     Aeq[i.getId() - 1][tempColumn2 - 1] = -1;
                 }
@@ -383,11 +384,11 @@ public class Utility {
             for (Node j : graph.getN()) {
                 int tempColumn = nF + (j.getId() - 1) * N + i.getId();
                 int tempColumn2 = nF + (i.getId() - 1) * N + j.getId();
-                if (Match(graph.getUPrime(t+1), j.getId(), i.getId())) {
+                if (Match(graph.getUPrime(observation,t+1), j.getId(), i.getId())) {
                     //     System.out.println("line number: row + i.getId() - 1 ~~~~~1: " + (row + i.getId() - 1));
                     Aeq[row + i.getId() - 1][tempColumn - 1] = 1;
                 }
-                if (Match(graph.getUPrime(t), i.getId(), j.getId())) {
+                if (Match(graph.getUPrime(observation, t), i.getId(), j.getId())) {
                     //    System.out.println("line number: row + i.getId() - 1 ~~~~~2: " + (row + i.getId() - 1));
                     Aeq[row + i.getId() - 1][tempColumn2 - 1] = -1;
                 }
@@ -457,11 +458,11 @@ public class Utility {
         // line 4 and 5
         for (Node i : graph.getNs()) {
             for (Node j : graph.getN()) {
-                if (Match(graph.getUPrime(t), i.getId(), j.getId())) {
+                if (Match(graph.getUPrime(observation, t), i.getId(), j.getId())) {
                     //     System.out.println("line number: row + i.getId() - 1 positive: " + (row + i.getId() - 1));
                     A[row + i.getId() - 1][nF + (i.getId() - 1) * N + j.getId() - 1] = 1;
                 }
-                if (Match(graph.getUPrime(t), j.getId(), i.getId())) {
+                if (Match(graph.getUPrime(observation, t), j.getId(), i.getId())) {
                     //   System.out.println("line number: row + i.getId() - 1: " + (row + i.getId() - 1));
                     A[row + i.getId() - 1][nF + (j.getId() - 1) * N + i.getId() - 1] = -1;
                 }
@@ -469,7 +470,7 @@ public class Utility {
             b[row + i.getId() - 1] = i.getRs(t);
         }
 
-        System.out.println("1.5-----------");
+      //  System.out.println("1.5-----------");
         //1.5
         row = row + N;
         for (Node i : graph.getNd()) {
@@ -482,11 +483,11 @@ public class Utility {
         //1.6
 
         row += N;
-        System.out.println("1.6--------------");
+    //    System.out.println("1.6--------------");
         for (Node j : graph.getNp()) {
             double temp = 0;
             for (Node i : graph.getN()) {
-                if (Match(graph.getUPrime(t), i.getId(), j.getId())) {
+                if (Match(graph.getUPrime(observation, t), i.getId(), j.getId())) {
                     //            System.out.println("line number: row + i.getId() - 1 positive: " + (row + i.getId() - 1));
                     A[row + j.getId() - 1][nF + (i.getId() - 1) * N + j.getId() - 1] = 1;
                     temp = temp - graph.getFC()[i.getId() - 1][j.getId() - 1];
@@ -505,7 +506,7 @@ public class Utility {
         // 1.7
         row += N * N;
         //row 1.7
-        System.out.println("1.7---------------");
+      //  System.out.println("1.7---------------");
         for (Node j : graph.getNp()) {
             for (int m = 2; m <= Cj[j.getId() - 1]; m++) {
                 if (j.getId() > 1) {
@@ -523,7 +524,7 @@ public class Utility {
 
 
         // 1.8
-        System.out.println("1.8---------------");
+     //   System.out.println("1.8---------------");
         row += getSum(Cj);
         for (Node i : graph.getNp()) {
             for (Node j : graph.getNp()) {
@@ -687,23 +688,23 @@ public class Utility {
 
             if (model.solve()) {
 
-                System.out.println("obj = " + model.getObjValue());
+           //     System.out.println("obj = " + model.getObjValue());
 
             }
 
-            System.out.println("Complete");
+       //     System.out.println("Complete");
             double []xDouble = new double[x.length];
             for (int i =0; i < xDouble.length; i++) {
                 xDouble[i] = model.getValue(x[i]);
 
             }
             double X[][] = Matrix.transpose(Matrix.reshape(xDouble, 0, nY, N));
-            printDoubleArray(X);
+      //      printDoubleArray(X);
             double [][]Y = null;
 
             if (unique(Cj).length ==1) {
-                System.out.println(nW);
-                System.out.println(nY +1 -1);
+          //      System.out.println(nW);
+        //        System.out.println(nY +1 -1);
 
                 Y = Matrix.transpose(Matrix.reshape(xDouble, nY +1 -1, nW+1,(int)Utility.max(Cj)));
             } else {
@@ -717,11 +718,14 @@ public class Utility {
             double K[] = subarray(xDouble, nK +1-1, xDouble.length);  // ki.
 
 
+            graph.updateRD( t+1,  K);
+            graph.updateRS(observation, t+1, F);
+
             System.out.println("time t : " +t);
 
-            BState s0 = new BState(t,graph.getbeta() , 0, graph.getRS(t), graph.getRD(t));
+            BState s0 = new BState(t,graph.getbeta(t, level) , 0, graph.getRS(t), graph.getRD(t));
             StateManager.getInstance().put(t, s0 );
-            try {
+          /*  try {
                 writeFile("javaW.txt", W);
                 writeFile("javaS.txt", S);
                 writeFile("javaD.txt", D);
@@ -732,10 +736,22 @@ public class Utility {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            */
         } catch (IloException e) {
             e.printStackTrace();
         }
+
+
         return model.getObjValue();
+    }
+
+    public static boolean isSupply(int i, List<Node> nodes) {
+        for(Node each : nodes) {
+            if (each.getId() == i && each.getType().equals("s")){
+                return true;
+            }
+        }
+        return false;
     }
 
 
