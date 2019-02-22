@@ -47,11 +47,6 @@ public class Node {
         return id;
     }
 
-    public void setId(int name) {
-        this.id = name;
-    }
-
-
     public double getRs(int t) {
         return RS.get(t);
     }

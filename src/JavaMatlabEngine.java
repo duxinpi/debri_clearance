@@ -1,4 +1,4 @@
-import com.mathworks.engine.*;
+//import com.mathworks.engine.*;
 
 import java.util.concurrent.Future;
 
@@ -9,7 +9,7 @@ public class JavaMatlabEngine {
 
 
 
-
+/*
 
     public static void main(String[] args) throws Exception{
         MatlabEngine eng = MatlabEngine.startMatlab();
@@ -31,5 +31,5 @@ public class JavaMatlabEngine {
         ml.eval("cd /Users/xdu/Documents/cornell/sysen5900/Matlab-1");
         // Evaluate the function
         ml.eval("Main");
-    }
+    }*/
 }

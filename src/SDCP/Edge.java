@@ -13,11 +13,10 @@ public class Edge {
 
 
 
-    public List<double[]> W_ij = new ArrayList<>(); //required resource
-    public List<double[]> beta = new ArrayList<>(); //required resource
+    public List<double[]> W_ij = new ArrayList<>(); //required resource at each time t.
+    public List<double[]> beta = new ArrayList<>();
 
 
-    private Resource DL_ij = new Resource();
 
 
 
@@ -36,14 +35,12 @@ public class Edge {
         this.j = j;
     }
 
-    public Edge(int i, int j, Resource DL_ij, double FC_ij, double T, double R, double[] W, double []beta) {
+    public Edge(int i, int j, double FC_ij, double T, double R, double[] W, double []beta) {
         this.i  = i;
         this.j = j;
-        this.DL_ij = DL_ij;
         this.FC_ij =FC_ij;
         this.T = T;
         this.R = R;
-        this.W_ij.add(W);
         this.W_ij.add(W);
         this.W_ij.add(W);
         this.W_ij.add(W);
@@ -64,13 +61,6 @@ public class Edge {
         return ("[ " + i + " " + j +" ]");
     }
 
-    public Resource getDL() {
-        return DL_ij;
-    }
-
-    public void setDL(Resource DL) {
-        this.DL_ij = DL;
-    }
 
     public double getT() {
         return T;
