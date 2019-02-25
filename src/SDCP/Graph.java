@@ -16,9 +16,6 @@ public class Graph {
     public int t = 0;
 
     List<List<Edge>> B = new ArrayList<>();
-    List<List<Edge>> UPrime = new ArrayList<>();
-    List<List<Edge>> EPrime = new ArrayList<>();
-    List<List<Edge>> EPrimePrime = new ArrayList<>();
     List<List<Edge>> U = new ArrayList<>();
     List<List<Edge>> UB = new ArrayList<>();
     List<List<Edge>> RB = new ArrayList<>();
@@ -152,7 +149,7 @@ public class Graph {
         return sum;
     }
 
-    public List<Edge> getObservationSpace(List<Edge> action, int t) {
+    public List<Edge> getObservation(List<Edge> action, int t) {
 
         List<Edge> UBt = UB.get(t);
         Set<Edge> result = new HashSet<>();
@@ -184,23 +181,24 @@ public class Graph {
     }
 
 
-    public List<List<Edge>> getAllObservations(List<Edge> action, int t) {
+    public List<Observation> getAllObservations(List<Edge> action, int t) {
         // observation is supposed to contain only w_i_j, but here I use edges, it's easier to find w_ij and beta of the corresponding w_ij.
 
-        List<Edge>  space = getObservationSpace(action, t);
+        List<List<Edge>> allCombinations = new ArrayList<>();
         List<Edge> edges = new ArrayList<>();
-        List<List<Edge>> allObservations = new ArrayList<>();
-        getAllSequences(edges, space, allObservations, 0);
-      /*  List<List<Edge>> result = new ArrayList<>();
-        for (int i =0; i < allObservations.size(); i++) {
-                if (getW(allObservations.get(i), t) <= getRCt(t)){
-                    result.add((allObservations.get(i)));
-                }
-        }
-        return result;
-        */
-      return allObservations;
+        getAllSequences(edges, action, allCombinations, 0);
+        List<Observation> result = new ArrayList<>();
+        for (int i =0; i < allCombinations.size(); i++){
+            List<Edge> each = allCombinations.get(i);
+            if (each.size()==0) continue;
+            List<Edge> observation = getObservation(each, t);
+            BState bState = new BState(t, B.get(t), getRCt(t), getRS(t), getRD(t));
 
+            Observation observationObj = new Observation(observation, action, bState,E, N, t);
+
+            result.add(observationObj);
+        }
+      return result;
     }
 
 
@@ -208,15 +206,14 @@ public class Graph {
      * Equation#4, compute probability of an observation.
      *
      * @param observation
-     * @param t
      * @return
      */
-    public double getPofObservation(List<Edge> observation, int t) {
+    public double getPofObservation(Observation observation) {
         double sum = 1;
         for (Edge edge : observation) {
             for (int i = 0; i < levels; i++) {
-                if (edge.beta.get(t)[i]>0) {
-                    sum *= edge.beta.get(t)[i];
+                if (edge.beta[i]>0) {
+                    sum *= edge.beta[i];
                 }
             }
         }
@@ -240,23 +237,24 @@ public class Graph {
     public double getER(int t, List<Edge> action, int level) throws IloException {
 
         double result = 0;
-        for (List<Edge> eachObservation : getAllObservations(action, t)) {
-            result += getPofObservation(eachObservation, t) * getReward(eachObservation, t, level);
+        for (Observation eachObservation : getAllObservations(action, t)) {
+            result += getPofObservation(eachObservation) * getReward(eachObservation, t, level);
 
         }
         return result;
     }
 
-
+/*
     public List<Edge> getUprime(List<Edge> observation, int t) {
         return observation;
-    }
+    }*/
 
     // above date : 2/19/2019
 
 
 
 
+/*
 
     public void setUPrime(List<Edge> edges, int t) {
         UPrime.set(t, edges);
@@ -265,6 +263,7 @@ public class Graph {
 
     }
 
+*/
 
 
    /* public List<Edge> getB(int t) {
@@ -347,10 +346,12 @@ public class Graph {
         return result;
     }
 
+/*
 
     public List<Edge> getUPrime(List<Edge> observation, int t) {
         return UPrime.get(t);
     }
+*/
 
     private Resource k_t = new Resource(); // total of clearance capacity
 
@@ -527,6 +528,7 @@ Tij
 
     }
 
+/*
 
     public double[][] getbeta(int t, int level) {
         double[][] result = new double[E.size()][E.size()];
@@ -535,8 +537,9 @@ Tij
         }
         return result;
     }
+*/
 
-    public double getsumGarmma(int t) {
+  /*  public double getsumGarmma(int t) {
         double sum = 0;
         for (int i = 0; i < levels; i++) {
             sum += getGarma(t, i);
@@ -552,7 +555,7 @@ Tij
         // gamma(lamda)
         double garmaSum = getsumGarmma(t);
         for (Edge edge : E) {
-          /*  double[] previousBeta = edge.beta.get(t-1);
+          *//*  double[] previousBeta = edge.beta.get(t-1);
             double[] newBeta = new double[2];
             if (Utility.contains(getUB(t), edge)){
                 newBeta[0] = (getGarma(t, 0)/garmaSum) * previousBeta[0];
@@ -560,11 +563,11 @@ Tij
             } else if (Utility.contains(getRB(t), edge)){
                 newBeta[0] =1;
                 newBeta[1] =1;
-            }*/
+            }*//*
             //  edge.beta.add(newBeta);
         }
     }
-
+*/
 
     public double getKt(int t, int level) {
         if (t == 0) {
@@ -1007,7 +1010,7 @@ Tij
         System.out.print("test .........................................................");
 
 
-        System.out.println(" ---  all actions: " + graph.getAllSequences(0));
+        System.out.println(" ---  all actions: " + graph.getAllSequences(graph.E));
         //  System.out.println(graph.getAllFeasibleActions(0).size());
       /*  try {
           //  System.out.print("test ...:"+ graph.getBenefit(0));

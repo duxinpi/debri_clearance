@@ -14,7 +14,7 @@ public class Edge {
 
 
     public List<double[]> W_ij = new ArrayList<>(); //required resource at each time t.
-    public List<double[]> beta = new ArrayList<>();
+    public double[] beta = new double[2];
 
 
 
@@ -44,7 +44,7 @@ public class Edge {
         this.W_ij.add(W);
         this.W_ij.add(W);
         this.W_ij.add(W);
-        this.beta.add(beta);
+        this.beta=beta;
     }
 
     public int getI(){
