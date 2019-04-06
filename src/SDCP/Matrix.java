@@ -27,6 +27,18 @@ public class Matrix {
         return sum;
     }
 
+    public static double [][] reshape(double x[], int start, int end, int row) {
+        int sumElements = end - start;
+        int column = sumElements/ row;
+        double[][] result = new double[row][column];
+        for (int i = 0; i < column; i++) {
+            for (int j =0; j < row; j++) {
+                result[j][i] = x[start++];
+            }
+        }
+        return result;
+    }
+
     // return B = A^T
     public static double[][] transpose(double[][] a) {
         int m = a.length;

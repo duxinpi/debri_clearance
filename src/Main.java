@@ -419,6 +419,35 @@ public class Main {
 
             System.out.println("Complete");
 
+
+            double []xDouble = new double[x.length];
+            for (int i =0; i < xDouble.length; i++) {
+                xDouble[i] = model.getValue(x[i]);
+
+            }
+            double X[][] = Matrix.transpose(Matrix.reshape(xDouble, 0, nY, N));
+            //      printDoubleArray(X);
+            double [][]Y = null;
+/*
+            if (unique(Cj).length ==1) {
+                //      System.out.println(nW);
+                //        System.out.println(nY +1 -1);
+
+                Y = Matrix.transpose(Matrix.reshape(xDouble, nY +1 -1, nW+1,(int)Utility.max(Cj)));
+            } else {
+                //Y = subarray(xDouble, nY +1 -1, nW+1);
+            }*/
+
+            double W[] = subarray(xDouble, nW+1 -1, nS);
+            double S[] = subarray(xDouble, nS+1 -1, nD );
+            double D[] = subarray(xDouble, nD +1 -1, nF );
+            double F[][] =  Matrix.transpose(Matrix.reshape(xDouble, nF +1 -1, nK+1,N));
+            printDoubleArray(F);
+            double K[] = subarray(xDouble, nK +1-1, xDouble.length);  // ki.
+            System.out.println("----k 0-" + K[0]);
+            System.out.println("----k 7-" + K[6]);
+            System.out.println("----bi-" + graph.getBiArray()[0]);
+            System.out.println("----bi-" + graph.getBiArray()[7-1]);
         } catch (IloException e) {
             e.printStackTrace();
         }

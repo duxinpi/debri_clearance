@@ -260,7 +260,13 @@ public class Utility {
         }
         return result;
     }
-
+    public static double[] subarray(double x[], int i , int j) {
+        double[] r = new double[j-i];
+        for (int k =0; k < r.length; k++) {
+            r[k] = x[i++];
+        }
+        return r;
+    }
     public static double[] read(String path, int r) throws Exception {
         // We need to provide file path as the parameter:
         // double backquote is to avoid compiler interpret words
