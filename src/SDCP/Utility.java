@@ -131,7 +131,6 @@ public class Utility {
         for (int i =0; i < matlabA.length; i++) {
             for (int j =0; j < matlabA[0].length; j++) {
                 if (Math.abs(matlabA[i][j]- javaA[i][j]) >0.01){
-
                     System.out.println("file: " + file1 + "diff: " + i + "-----" + j + " : " + matlabA[i][j] +"----java---" + javaA[i][j]);
                 }
             }
@@ -150,7 +149,7 @@ public class Utility {
         for (int i =0; i < matlabA.length; i++) {
 
                 if (Math.abs(matlabA[i]- javaA[i]) >0.000000000001){
-                    System.out.println("file: " + file1 + "=====diff: " + i + "----- : " + matlabA[i] +"----java---" + javaA[i]);
+                 //   System.out.println("file: " + file1 + "=====diff: " + i + "----- : " + matlabA[i] +"----java---" + javaA[i]);
                 }
 
         }
@@ -174,6 +173,8 @@ public class Utility {
     }
 
     public static void writeFile(String filePath, double[] array) throws IOException {
+        File f = new File(filePath);
+        f.delete();
         PrintWriter writer = new PrintWriter(filePath, "UTF-8");
         for (int i = 0; i < array.length; i++) {
                 writer.print(array[i]);
@@ -270,7 +271,38 @@ public class Utility {
         return r;
     }
 
+    public static List<Edge> findAllReachableBlock(List<Edge> unblockedEdges, List<Edge> edgesSet, List<Node> nodes) {
+        Set<Edge> result = new HashSet<>();
+        for (Edge edge : edgesSet) {
+            if (isAdjcent(unblockedEdges, edge) || Utility.isSupply(edge.getJ(), nodes) || Utility.isSupply(edge.getI(), nodes)) {
+                result.add(edge);
+            }
+        }
+        result.addAll(unblockedEdges);
 
+        return new ArrayList<>(result);
+    }
+
+    public static boolean isSupply(int i, List<Node> nodes) {
+        for(Node each : nodes) {
+            if (each.getId() == i && each.getType().equals("s")){
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    public static boolean isAdjcent(List<Edge> edges, Edge b) {
+
+        for (Edge a : edges) {
+            if (isAdjcent(a, b)) return true;
+        }
+        return false;
+    }
+    public static boolean isAdjcent(Edge a, Edge b) {
+        return a.getI() == b.getI() || a.getJ() == b.getI() || a.getJ() == b.getJ() || a.getI() == b.getJ();
+    }
 
     public static List<Edge> exclude(List<Edge> edgeSet, List<Edge> subset) {
         List<Edge> result = new ArrayList<>();
@@ -296,7 +328,7 @@ public class Utility {
 
 
 
-    public static double getZ(Graph graph, int t, List<Edge> observation, int level) throws IloException {
+    public static double getZ(Graph graph, int t, Observation observation, int level) throws IloException {
 
         int N = graph.getNsize();
         int nX = 0;
@@ -358,11 +390,11 @@ public class Utility {
             for (Node j : graph.getN()) {
                 int tempColumn = nF + (j.getId() - 1) * N + i.getId();
                 int tempColumn2 = nF + (j.getId() - 1) * N + j.getId();
-                if (Match(graph.getUPrime(observation, t), j.getId(), i.getId())) {
+                if (Match(observation.getUprime(), j.getId(), i.getId())) {
                     //     System.out.println("line number: row +i.getId() - 1 positive: " + (i.getId() - 1));
                     Aeq[i.getId() - 1][tempColumn - 1] = 1;
                 }
-                if (Match(graph.getUPrime(observation, t), i.getId(), j.getId())) {
+                if (Match(observation.getUprime(), i.getId(), j.getId())) {
                     //             System.out.println("line number: row +i.getId() - 1 positive1: " + (i.getId() - 1));
                     Aeq[i.getId() - 1][tempColumn2 - 1] = -1;
                 }
@@ -384,11 +416,11 @@ public class Utility {
             for (Node j : graph.getN()) {
                 int tempColumn = nF + (j.getId() - 1) * N + i.getId();
                 int tempColumn2 = nF + (i.getId() - 1) * N + j.getId();
-                if (Match(graph.getUPrime(observation,t+1), j.getId(), i.getId())) {
+                if (Match(observation.getUprimeNext(), j.getId(), i.getId())) {
                     //     System.out.println("line number: row + i.getId() - 1 ~~~~~1: " + (row + i.getId() - 1));
                     Aeq[row + i.getId() - 1][tempColumn - 1] = 1;
                 }
-                if (Match(graph.getUPrime(observation, t), i.getId(), j.getId())) {
+                if (Match(observation.getUprime(), i.getId(), j.getId())) {
                     //    System.out.println("line number: row + i.getId() - 1 ~~~~~2: " + (row + i.getId() - 1));
                     Aeq[row + i.getId() - 1][tempColumn2 - 1] = -1;
                 }
@@ -458,16 +490,16 @@ public class Utility {
         // line 4 and 5
         for (Node i : graph.getNs()) {
             for (Node j : graph.getN()) {
-                if (Match(graph.getUPrime(observation, t), i.getId(), j.getId())) {
+                if (Match(observation.getUprime(), i.getId(), j.getId())) {
                     //     System.out.println("line number: row + i.getId() - 1 positive: " + (row + i.getId() - 1));
                     A[row + i.getId() - 1][nF + (i.getId() - 1) * N + j.getId() - 1] = 1;
                 }
-                if (Match(graph.getUPrime(observation, t), j.getId(), i.getId())) {
+                if (Match(observation.getUprime(), j.getId(), i.getId())) {
                     //   System.out.println("line number: row + i.getId() - 1: " + (row + i.getId() - 1));
                     A[row + i.getId() - 1][nF + (j.getId() - 1) * N + i.getId() - 1] = -1;
                 }
             }
-            b[row + i.getId() - 1] = i.getRs(t);
+            b[row + i.getId() - 1] = observation.bState.RS_t[i.getId()-1];
         }
 
       //  System.out.println("1.5-----------");
@@ -487,7 +519,7 @@ public class Utility {
         for (Node j : graph.getNp()) {
             double temp = 0;
             for (Node i : graph.getN()) {
-                if (Match(graph.getUPrime(observation, t), i.getId(), j.getId())) {
+                if (Match(observation.getUprime(), i.getId(), j.getId())) {
                     //            System.out.println("line number: row + i.getId() - 1 positive: " + (row + i.getId() - 1));
                     A[row + j.getId() - 1][nF + (i.getId() - 1) * N + j.getId() - 1] = 1;
                     temp = temp - graph.getFC()[i.getId() - 1][j.getId() - 1];
@@ -602,7 +634,7 @@ public class Utility {
         IloNumVar[] x = new IloNumVar[f.length];
 
         try {
-            writeFile("javaA.txt", A);
+            writeFile("javaA.txt", b);
             writeFile("javaAeq.txt", Aeq);
             writeFile("javab.txt", b);
             writeFile("javabeq.txt", beq);
@@ -716,15 +748,16 @@ public class Utility {
             double D[] = subarray(xDouble, nD +1 -1, nF );
             double F[][] =  Matrix.transpose(Matrix.reshape(xDouble, nF +1 -1, nK+1,N));
             double K[] = subarray(xDouble, nK +1-1, xDouble.length);  // ki.
+            observation.K = K;
 
 
-            graph.updateRD( t+1,  K);
-            graph.updateRS(observation, t+1, F);
+         //   graph.updateRD( t+1,  K);
+         //   graph.updateRS(observation, t+1, F);
 
             System.out.println("time t : " +t);
 
-            BState s0 = new BState(t,graph.getbeta(t, level) , 0, graph.getRS(t), graph.getRD(t));
-            StateManager.getInstance().put(t, s0 );
+         //   BState s0 = new BState(t,graph.getbeta(t, level) , 0, graph.getRS(t), graph.getRD(t));
+         //   StateManager.getInstance().put(t, s0 );
           /*  try {
                 writeFile("javaW.txt", W);
                 writeFile("javaS.txt", S);
@@ -745,14 +778,20 @@ public class Utility {
         return model.getObjValue();
     }
 
-    public static boolean isSupply(int i, List<Node> nodes) {
-        for(Node each : nodes) {
-            if (each.getId() == i && each.getType().equals("s")){
-                return true;
-            }
+    public static void getAllSequences(List<Edge> edges, List<Edge> current, List<List<Edge>> result, int k) {
+        if (k == current.size()) {
+            return ;
         }
-        return false;
+        for (int i =0; i < current.size();i++) {
+            Edge e = current.get(i);
+            edges.add(e);
+            result.add(new ArrayList<>(edges));
+            getAllSequences(edges, current, result,  k+1);
+            edges.remove(e);
+        }
+        return ;
     }
+
 
 
 }
