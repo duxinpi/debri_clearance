@@ -98,14 +98,14 @@ public class Utility {
         return sum;
     }
 
-    public static double getWSum(List<Edge> edges, int t, int level) {
+    /*public static double getWSum(List<Edge> edges, int t, int level) {
         double sum =0;
         for (Edge e : edges) {
             sum+= e.W_ij.get(t)[level];
         }
         return sum;
     }
-
+*/
 
     public static void main(String ars[]) {
         // generateParenthesis(3);
@@ -114,9 +114,9 @@ public class Utility {
      //   compare("javaA.txt","matlabA.txt", 1512, 378);
      //   compare("javaAeq.txt","matlab_Aeq.txt", 36, 378);
 
-        compare("javabeq.txt","matlab_beq.txt", 1512 );
-        compare("javab.txt","matlab_b.txt", 1512 );
-        compare("javaf.txt","matlab_f.txt", 1512 );
+    //    compare("javabeq.txt","matlab_beq.txt", 1512 );
+    //    compare("javab.txt","matlab_b.txt", 1512 );
+     //   compare("javaf.txt","matlab_f.txt", 1512 );
     }
 
     public static void compare(String file1, String file2, int r, int c) {
@@ -131,6 +131,7 @@ public class Utility {
         for (int i =0; i < matlabA.length; i++) {
             for (int j =0; j < matlabA[0].length; j++) {
                 if (Math.abs(matlabA[i][j]- javaA[i][j]) >0.01){
+
                     System.out.println("file: " + file1 + "diff: " + i + "-----" + j + " : " + matlabA[i][j] +"----java---" + javaA[i][j]);
                 }
             }
@@ -149,7 +150,7 @@ public class Utility {
         for (int i =0; i < matlabA.length; i++) {
 
                 if (Math.abs(matlabA[i]- javaA[i]) >0.000000000001){
-                 //   System.out.println("file: " + file1 + "=====diff: " + i + "----- : " + matlabA[i] +"----java---" + javaA[i]);
+                    System.out.println("file: " + file1 + "=====diff: " + i + "----- : " + matlabA[i] +"----java---" + javaA[i]);
                 }
 
         }
@@ -173,8 +174,6 @@ public class Utility {
     }
 
     public static void writeFile(String filePath, double[] array) throws IOException {
-        File f = new File(filePath);
-        f.delete();
         PrintWriter writer = new PrintWriter(filePath, "UTF-8");
         for (int i = 0; i < array.length; i++) {
                 writer.print(array[i]);
@@ -300,9 +299,6 @@ public class Utility {
         }
         return false;
     }
-    public static boolean isAdjcent(Edge a, Edge b) {
-        return a.getI() == b.getI() || a.getJ() == b.getI() || a.getJ() == b.getJ() || a.getI() == b.getJ();
-    }
 
     public static List<Edge> exclude(List<Edge> edgeSet, List<Edge> subset) {
         List<Edge> result = new ArrayList<>();
@@ -326,9 +322,31 @@ public class Utility {
         return false;
     }
 
+    public static Edge getEdge(List<Edge> edges, int i, int j){
+        for (Edge each : edges){
+            if (each.getJ() == j && each.getI() == i){
+                return  each;
+            }
+            if (each.getI() == j && each.getJ() == i){
+                return  each;
+            }
+        }
+        return null;
+    }
+
+    public static boolean isAdjcent(Edge a, Edge b){
+        if (a.getJ() == b.getJ() && a.getI() == b.getI()){
+            return false;
+        }
+        if (a.getJ() == b.getI() && a.getI() == b.getJ()){
+            return false;
+        }
+
+        return a.getI() == b.getI() || a.getJ() == b.getI() || a.getJ() == b.getJ() || a.getI() == b.getJ();
+    }
 
 
-    public static double getZ(Graph graph, int t, Observation observation, int level) throws IloException {
+    public static double getZ(Graph graph, int t, Observation observation) throws IloException {
 
         int N = graph.getNsize();
         int nX = 0;
@@ -367,17 +385,21 @@ public class Utility {
         for (Node each : graph.getNd()) {// what is this?
             f[each.getId() + nK - 1] = -graph.getBiArray()[each.getId() - 1];
         }
-        for (Node i : graph.getNp()) {
-            for (Node j : graph.getNp()) {
+        List<Double> tempForLog1 = new ArrayList<>();
+        List<Double> tempForLog2 = new ArrayList<>();
+        for (Node i : observation.getNp()) {
+            for (Node j : observation.getNp()) {
                 int m = nX + (i.getId() - 1) * N + j.getId() - 1;
                 int n = nW + (i.getId() - 1) * N + j.getId() - 1;
-                //  System.out.println(m + "---" + n);
 
                 f[nX + (i.getId() - 1) * N + j.getId() - 1] = i.getLamda(t) * graph.getPeriodT()[i.getId() - 1][j.getId() - 1];
                 f[nW + (i.getId() - 1) * N + j.getId() - 1] = GlobalData.SIGMA * graph.getR()[i.getId() - 1][j.getId() - 1];
+                tempForLog1.add(   f[nX + (i.getId() - 1) * N + j.getId() - 1]);
+                tempForLog2.add(   f[nW + (i.getId() - 1) * N + j.getId() - 1]);
             }
 
         }
+
        // printArray(f);
 
 
@@ -432,7 +454,7 @@ public class Utility {
 
         // 1.10
         row += graph.getNsize();
-        for (Node each : graph.getNp()) {
+        for (Node each : observation.getNp()) {
             for (int m = 1; m <= Cj[each.getId() - 1]; m++) {
                 if (each.getId() > 1) {
                     //             System.out.println("line number: row + i.getId() - 1 ~~~~~2: " + (row + 1 - 1));
@@ -450,8 +472,8 @@ public class Utility {
         //1.11
         row++;
 
-        for (Node i : graph.getNp()) {
-            for (Node j : graph.getNp()) {
+        for (Node i : observation.getNp()) {
+            for (Node j : observation.getNp()) {
                 //     System.out.println("line number: row + i.getId() - 1 ~~~~~1: " + (row + i.getId() - 1));
                 Aeq[row + i.getId() - 1][nW + (i.getId() - 1) * N + j.getId() - 1] = 1;
             }
@@ -464,8 +486,8 @@ public class Utility {
         //1.12
         row = row + N;
 
-        for (Node j : graph.getNp()) {
-            for (Node i : graph.getNp()) {
+        for (Node j : observation.getNp()) {
+            for (Node i : observation.getNp()) {
                 Aeq[row + j.getId() - 1][nW + (i.getId() - 1) * N + j.getId() - 1] = 1;
             }
             Aeq[row + j.getId() - 1][nD + j.getId() - 1] = -1;
@@ -476,8 +498,8 @@ public class Utility {
         // 19 New Cons
         row = row + N;
 
-        for (Node i : graph.getNp()) {
-            for (Node j : graph.getNp()) {
+        for (Node i : observation.getNp()) {
+            for (Node j : observation.getNp()) {
 
                 Aeq[row + i.getId() - 1][nX + (i.getId() - 1) * N + j.getId() - 1] = 1;
             }
@@ -500,6 +522,7 @@ public class Utility {
                 }
             }
             b[row + i.getId() - 1] = observation.bState.RS_t[i.getId()-1];
+            System.out.println("---rs------" + observation.bState.RS_t[i.getId()-1]);
         }
 
       //  System.out.println("1.5-----------");
@@ -509,6 +532,7 @@ public class Utility {
             A[row + i.getId() - 1][nK + i.getId() - 1] = 1;
             //     System.out.println("line number: row + i.getId() - 1 positive: " + (row + i.getId() - 1));
             b[row + i.getId() - 1] = i.getRd(t);
+            System.out.println("---- RD: " + i.getRd(t));
         }
 
 
@@ -516,7 +540,7 @@ public class Utility {
 
         row += N;
     //    System.out.println("1.6--------------");
-        for (Node j : graph.getNp()) {
+        for (Node j : observation.getNp()) {
             double temp = 0;
             for (Node i : graph.getN()) {
                 if (Match(observation.getUprime(), i.getId(), j.getId())) {
@@ -539,7 +563,7 @@ public class Utility {
         row += N * N;
         //row 1.7
       //  System.out.println("1.7---------------");
-        for (Node j : graph.getNp()) {
+        for (Node j : observation.getNp()) {
             for (int m = 2; m <= Cj[j.getId() - 1]; m++) {
                 if (j.getId() > 1) {
                     //        System.out.println("line number: row + (int) getSum(Cj, 0, j.getId() - 1) + m - 1: " + (row + (int) getSum(Cj, 0, j.getId() - 1) + m - 1));
@@ -558,8 +582,8 @@ public class Utility {
         // 1.8
      //   System.out.println("1.8---------------");
         row += getSum(Cj);
-        for (Node i : graph.getNp()) {
-            for (Node j : graph.getNp()) {
+        for (Node i : observation.getNp()) {
+            for (Node j : observation.getNp()) {
                 //      System.out.println("line number: row + (row + (i.getId() - 1) * N + j.getId() - 1: " + (row + (i.getId() - 1) * N + j.getId() - 1));
                 A[row + (i.getId() - 1) * N + j.getId() - 1][nX + (i.getId() - 1) * N + j.getId() - 1] = 1;
                 if (j.getId() > 1) {
@@ -573,8 +597,8 @@ public class Utility {
 
         //1.9
         row = row + N * N;
-        for (Node j : graph.getNp()) {
-            for (Node i : graph.getNp()) {
+        for (Node j : observation.getNp()) {
+            for (Node i : observation.getNp()) {
                 A[row + j.getId() - 1][nX + (i.getId() - 1) * N + j.getId() - 1] = i.getLamda(t);
             }
 
@@ -596,7 +620,7 @@ public class Utility {
 
         //1.13
         row += N;
-        for (Node j : graph.getNp()) {
+        for (Node j : observation.getNp()) {
             A[row + j.getId() - 1][nD + j.getId() - 1] = -1;
             for (int m = 1; m <= Cj[j.getId() - 1]; m++) {
                 if (j.getId() > 1) {
@@ -610,7 +634,7 @@ public class Utility {
         // 1.14
 
         row += N;
-        for (Node j : graph.getNp()) {
+        for (Node j : observation.getNp()) {
             A[row + j.getId() - 1][nS + j.getId() - 1] = -1;
             for (int m = 1; m <= Cj[j.getId() - 1]; m++) {
                 if (j.getId() > 1) {
@@ -633,18 +657,18 @@ public class Utility {
 
         IloNumVar[] x = new IloNumVar[f.length];
 
-        try {
-            writeFile("javaA.txt", b);
+      /*  try {
+         *//*   writeFile("javaA.txt", A);
             writeFile("javaAeq.txt", Aeq);
             writeFile("javab.txt", b);
             writeFile("javabeq.txt", beq);
-            writeFile("javaf.txt", f);
+            writeFile("javaf.txt", f);*//*
             // writeFile("matlab_f.txt", f);
 
 
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
 
         try {
             // init our min expression
@@ -747,14 +771,20 @@ public class Utility {
             double S[] = subarray(xDouble, nS+1 -1, nD );
             double D[] = subarray(xDouble, nD +1 -1, nF );
             double F[][] =  Matrix.transpose(Matrix.reshape(xDouble, nF +1 -1, nK+1,N));
+            printDoubleArray(F);
             double K[] = subarray(xDouble, nK +1-1, xDouble.length);  // ki.
+            System.out.println("----k 0-" + K[0]);
+            System.out.println("----k 7-" + K[6]);
+            System.out.println("----bi-" + graph.getBiArray()[0]);
+            System.out.println("----bi-" + graph.getBiArray()[7-1]);
+
             observation.K = K;
 
 
          //   graph.updateRD( t+1,  K);
          //   graph.updateRS(observation, t+1, F);
 
-            System.out.println("time t : " +t);
+           // System.out.println("time t : " +t);
 
          //   BState s0 = new BState(t,graph.getbeta(t, level) , 0, graph.getRS(t), graph.getRD(t));
          //   StateManager.getInstance().put(t, s0 );
@@ -776,6 +806,15 @@ public class Utility {
 
 
         return model.getObjValue();
+    }
+
+    public static void printArray(List<Edge> edges) {
+        for (Edge edge : edges) {
+
+            System.out.print("--" + edge.toString()+" --");
+
+        }
+        System.out.println();
     }
 
     public static void getAllSequences(List<Edge> edges, List<Edge> current, List<List<Edge>> result, int k) {

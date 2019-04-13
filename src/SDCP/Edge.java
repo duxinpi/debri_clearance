@@ -1,8 +1,6 @@
 package SDCP;
 
 
-import java.util.ArrayList;
-import java.util.List;
 
 public class Edge {
     private int i;
@@ -12,9 +10,9 @@ public class Edge {
 
 
 
-
-    public List<double[]> W_ij = new ArrayList<>(); //required resource at each time t.
     public double[] beta = new double[2];
+
+    public double w_ij[];
 
 
 
@@ -35,15 +33,13 @@ public class Edge {
         this.j = j;
     }
 
-    public Edge(int i, int j, double FC_ij, double T, double R, double[] W, double []beta) {
+    public Edge(int i, int j, double FC_ij, double T, double R, double []W, double []beta) {
         this.i  = i;
         this.j = j;
         this.FC_ij =FC_ij;
         this.T = T;
         this.R = R;
-        this.W_ij.add(W);
-        this.W_ij.add(W);
-        this.W_ij.add(W);
+        this.w_ij = W;
         this.beta=beta;
     }
 

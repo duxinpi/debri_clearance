@@ -14,7 +14,7 @@ public class Node {
     public Map<Integer, Double> Yt = new HashMap<>();
     public Map<Integer, Double> RS = new HashMap<>();
     public Map<Integer, Double> RD = new HashMap<>();
-    public Map<Integer, Double> lamda = new HashMap<>(); // arrival rate at node.
+    public Map<Integer, Double> lamda = new HashMap<>(); // arrival rate at nFode.
 
 
 //    private Resource b;  // benefit accrued
@@ -52,7 +52,7 @@ public class Node {
     }
 
     public double getRd(int t) {
-        return RD.get(t);
+        return RD.get(0);
     }
 
     public void setRS(int t, double value) {
@@ -93,7 +93,7 @@ public class Node {
     }
 
     public double getLamda(int t) {
-        return lamda.get(t);
+        return lamda.get(0);
     }
 
 
@@ -106,7 +106,7 @@ public class Node {
     }
 
     public double getYt(int t) {
-        return Yt.get(t);
+        return Yt.get(0);
     }
 
 

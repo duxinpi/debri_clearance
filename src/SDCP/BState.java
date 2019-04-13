@@ -9,23 +9,22 @@ public class BState {
 
 
     List<Edge> B; // use Edge to track beta i, j.
-    double RC_t[]; // remaining capacity of resource to clear all.
+    double RC_t; // remaining capacity of resource to clear all.
     public double[] RS_t;
-    public double[] kt;
+    public double kt;
     public double[] RD_t;
     double gamma;
-    int level;
     Observation observation;
+
     List<Edge> action;
     List<Node> N;
 
-    public BState(int t, List<Edge> B, double RC[], double[] RS, double[] RD, double[] kt, List<Node> N, int level) {
+    public BState(int t, List<Edge> B, double RC, double[] RS, double[] RD, double kt, List<Node> N) {
         this.t = t;
         this.RC_t = RC;
         this.RS_t = RS;
         this.RD_t = RD;
         this.B = B;
-        this.level = level;
         this.kt = kt;
         gamma =0;
         this.N = N;
@@ -52,11 +51,21 @@ public class BState {
     public void updateB() {
         for (Edge each : B) {
             if (Utility.contains(observation.UB, each)) {
-                each.beta[level] = each.beta[level]; //todo: udpate with gamma process.
-            } else if (each.W_ij.get(t)[level] < RC_t[level]) {
-                each.beta[level] = 0;
+                for (int i =0 ; i< each.w_ij.length;i++){
+                    each.beta[i] = each.beta[i]; //todo: udpate with gamma process.
+                }
+
             } else {
-                each.beta[level] = 1;
+
+                for (int i =0 ; i< each.w_ij.length;i++){
+                    if (i == 1){ // todo: here is supposed to be a real input from system.
+                        each.beta[i] = 1;
+                    } else {
+                        each.beta[i] =0;
+                    }
+
+                }
+
             }
         }
 
@@ -64,7 +73,7 @@ public class BState {
 
     public void updateRC(){
 
-        RC_t[level] = Math.max(getKt()[level] - getGarma(), 0);
+        RC_t = Math.max(getKt()- getGarma(), 0);
     }
 
     public void updateRS(Observation observation, int t, double[][] fij) {
@@ -101,15 +110,15 @@ public class BState {
         return getWsum();
     }
 
-    public double[] getKt() {
+    public double getKt() {
 
         return kt;
     }
 
     public double getWsum() {
         double sum = 0;
-        for (int i = 0; i < observation.size(); i++) {
-            sum += observation.get(i).W_ij.get(t)[level];
+        for (int i = 0; i < observation.observation.size(); i++) {
+            sum += observation.observation.get(i).w_ij[1];
         }
         return sum;
     }

@@ -2,10 +2,13 @@ package SDCP;
 
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
 import static SDCP.GlobalData.*;
 
-public class Observation extends ArrayList<Edge> {
+public class Observation  {
     List<Edge> observation;
     List<Edge> B = new ArrayList<>();
 
@@ -17,10 +20,9 @@ public class Observation extends ArrayList<Edge> {
     int t;
     BState bState;
     List<Edge> action;
-    List<List<Edge>> Uprime = new ArrayList<>();
     double K[];
 
-    public Observation(List<Edge> observation, List<Edge> action, BState bState, List<Edge> E, List<Node> N, int t) {
+    public Observation( List<Edge> observation, List<Edge> action, BState bState, List<Edge> E, List<Node> N, int t) {
 
         this.E = E;
         this.N = N;
@@ -37,14 +39,14 @@ public class Observation extends ArrayList<Edge> {
 
     public void initBlocked() {
         for (Edge e : E) {
+            boolean isBlocked = false;
             for(int i =0; i <levels;i++ ) {
-                boolean isBlocked = false;
-                if (e.W_ij.get(t)[i] > 0) {
+                if (e.w_ij[i] > 0) {
                     isBlocked = true;
                 }
-                if(isBlocked) {
-                    B.add(e);
-                }
+            }
+            if(isBlocked) {
+                B.add(e);
             }
         }
     }
@@ -100,6 +102,10 @@ public class Observation extends ArrayList<Edge> {
             e.beta[0] = e.beta[0];
             e.beta[1] = e.beta[1];
         }
+        for (Edge e: RB){
+            e.beta[0] =1;
+            e.beta[1] = 0;
+        }
 
         // todo: update beta for RB.
     }
@@ -119,6 +125,24 @@ public class Observation extends ArrayList<Edge> {
     public List<Edge> getUprime(){
         return action;
     }
+
+    public Node[] getNp(){
+        List<Edge> uprime = getUprime();
+        Set<Integer> np = new HashSet<>();
+        for (Edge each : uprime){
+            np.add(each.getJ());
+            np.add(each.getI());
+        }
+        List<Node> result = new ArrayList<>();
+        for (Node node : N) {
+            if (np.contains(node.getId())) {
+                result.add(node);
+            }
+        }
+        return result.toArray(new Node[result.size()]);
+    }
+
+
     public List<Edge> getUprimeNext(){
         return Utility.exclude(observation, action);
     }
