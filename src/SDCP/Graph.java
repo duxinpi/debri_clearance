@@ -158,13 +158,7 @@ public class Graph {
         return allActions;
     }
 
-  /*  public double getWsum(Edge edge, int t) {
-        double sum = 0;
-        for (int i = 0; i < levels; i++) {
-            sum += edge.W_ij.get(t)[i];
-        }
-        return sum;
-    }*/
+
 
     public List<Edge> getObservation(List<Edge> action, int t) {
 
@@ -204,17 +198,28 @@ public class Graph {
 
         getAllSequences(edges, action, allCombinations, 0);
 
+        double min = Double.MAX_VALUE;
+        List<Edge> eachObs = new ArrayList<>();
         for (int i = 0; i < allCombinations.size(); i++) {
             List<Edge> each = allCombinations.get(i);
             if (each.size() == 0) continue;
-            List<Edge> observation = getObservation(each, t);
-
-            bState = new BState(t, B.get(t), RC, getRS(t), getRD(t), kt, N);
-
-            Observation observationObj = new Observation(observation, action, bState, E, N, t);
-
-            result.add(observationObj);
+            double eachSum = Utility.getWSum( each);
+            if (min > eachSum) {
+                eachObs = each;
+                min = eachSum;
+            }
         }
+
+        if (eachObs.size() ==0) {
+            System.out.println("observation is empty for action:  " + action );
+        }
+        List<Edge> observation = getObservation(eachObs, t);
+
+        bState = new BState(t, B.get(t), RC, getRS(t), getRD(t), kt, N);
+
+        Observation observationObj = new Observation(observation, action, bState, E, N, t);
+
+        result.add(observationObj);
         System.out.println("observation size: " + result.size());
         return result;
     }

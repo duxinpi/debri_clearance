@@ -817,6 +817,18 @@ public class Utility {
         System.out.println();
     }
 
+    public static double getWSum(List<Edge> edges) {
+        double res = 0;
+        for (Edge each : edges) {
+            double min = Double.MAX_VALUE;
+            for (Double eachW : each.w_ij){
+                min = Math.min(eachW, min);
+            }
+            res += min;
+        }
+        return res;
+    }
+
     public static void getAllSequences(List<Edge> edges, List<Edge> current, List<List<Edge>> result, int k) {
         if (k == current.size()) {
             return ;
