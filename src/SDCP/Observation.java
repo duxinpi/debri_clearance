@@ -69,9 +69,12 @@ public class Observation  {
         for (int i = 0; i < action.size(); i++) {
             if (!U.contains(action.get(i))) {
                 U.add(action.get(i));
+                B.remove(action.get(i));
+                UB.remove(action.get(i));
+                RB.remove(action.get(i));
             }
         }
-        //update B
+    /*    //update B
         for (int i = 0; i < E.size(); i++) {
             boolean contains = false;
             for (int j = 0; j < U.size(); j++) {
@@ -83,14 +86,16 @@ public class Observation  {
             if (!contains) {
                 B.remove(E.get(i));
             }
-        }
+        }*/
         //update RB
         for (int i = 0; i < observation.size(); i++) {
             RB.add(observation.get(i));
+            UB.remove(observation.get(i));
+
         }//
-        RB = Utility.exclude(RB, action);
+      /*  RB = Utility.exclude(RB, action);
         //update UB
-        UB = Utility.exclude(B, RB);
+        UB = Utility.exclude(B, RB);*/
     }
     public void update(){
         updateEdges();

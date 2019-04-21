@@ -74,4 +74,12 @@ public class Edge {
         R = r;
     }
 
+    public double getWmin(){
+        double min = Double.MAX_VALUE;
+        for (double each : w_ij) {
+            min = Math.min(each, min);
+        }
+        return min;
+    }
+
 }

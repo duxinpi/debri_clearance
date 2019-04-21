@@ -11,7 +11,7 @@ import static SDCP.GlobalData.*;
 public class Graph {
     private List<Edge> E;
     private List<Node> N;
-    int R = 1;
+    int R = 20;
     public int t = 0;
 
     List<List<Edge>> B = new ArrayList<>();
@@ -24,7 +24,7 @@ public class Graph {
 
 
     public Graph() {
-        kt = 1;
+        kt = 20;
         RC = kt;
     }
 
@@ -33,22 +33,38 @@ public class Graph {
         B.clear();
         B.add(E);
         B.add(new ArrayList<>());
+        B.add(new ArrayList<>());
+        B.add(new ArrayList<>());
+        B.add(new ArrayList<>());
+
     }
 
     public void initUnblocked() {
         U.clear();
+        U.add(new ArrayList<>());
+        U.add(new ArrayList<>());
+        U.add(new ArrayList<>());
         U.add(new ArrayList<>());
     }
 
     public void initRB() {
         RB.clear();
         RB.add(new ArrayList<>());
+        RB.add(new ArrayList<>());
+        RB.add(new ArrayList<>());
+        RB.add(new ArrayList<>());
+
+
     }
 
     public void initUB() {
         UB.clear();
         List<Edge> ub = Utility.exclude(B.get(0), RB.get(0));
         UB.add(ub);
+        UB.add(new ArrayList<>());
+        UB.add(new ArrayList<>());
+        UB.add(new ArrayList<>());
+
     }
 
 
@@ -91,6 +107,7 @@ public class Graph {
                 List<Edge> action = new ArrayList<>();
                 for (int[] each : extend) {
                     Edge edge = Utility.getEdge(remain, each[0] + 1, each[1] + 1);
+                    if (edge!=null)
                     action.add(edge);
                 }
                 if (action.size() > 0) {
@@ -177,7 +194,7 @@ public class Graph {
         return new ArrayList<>(result);
     }
 
- /*   public double getW(List<Edge> edges, int t){
+ /*   public double getW(List<Edge> edges int t){
         double tempsum = 0;
         for (Edge each : edges) {
             tempsum += getWsum(each, t);
@@ -187,6 +204,84 @@ public class Graph {
     }
 */
 
+    public List<Observation> getAllObservations(List<Edge> action, List<Edge> UB, List<Edge> U, int t) {
+        List<Observation> result = new ArrayList<>();
+        List<Edge> actionRB = Utility.exclude(action, UB);
+        List<Integer> nodes = Utility.getNodeIndex(action);
+        double min = Integer.MAX_VALUE;
+        int minNode = -1;
+
+        for(int i =1; i <= GlobalData.B; i++) {
+            double sum = 0;
+
+            for (Integer each : nodes) {
+                Node node = Utility.getNode(each, N);
+
+                double mu = node.getMu();
+                sum = mu * node.getR0()[0];
+                for (int j = 1; j <=i; j++) {
+                    sum = sum +(node.getR0()[j] - node.getR0()[j-1]);
+                }
+
+
+                List<Integer> neighbours = Utility.NeighbourNodes(each, action);
+                double lamdaSum = 0;
+                for (int eachId : neighbours) {
+                    Node neigbhour = Utility.getNode(eachId, N);
+                    lamdaSum += neigbhour.getLamda(t);
+                }
+                if (sum - lamdaSum > 0) {
+                    if (sum - lamdaSum< min) {
+                        minNode = each;
+                        min = sum - lamdaSum;
+                    }
+                }
+
+            }
+            if (min != Integer.MAX_VALUE) break;
+
+        }
+        List<Edge> obSet = Utility.getNeighbours(minNode, UB);
+
+        Edge minOb = null;
+        double minCost = Double.MAX_VALUE;
+        for (Edge each: obSet) {
+            if (each.getWmin() < minCost) {
+                minOb = each;
+                minCost = each.getWmin();
+            }
+
+        }
+        List<Edge> observationMin = new ArrayList<>();
+        if (minOb!=null) {
+            observationMin.add(minOb);
+        }
+        bState = new BState(t, B.get(t), RC, getRS(t), getRD(t), kt, N);
+
+        Observation observationObj = new Observation(observationMin, action, bState, E, N, t);
+        if (observationMin.size()>0)
+        result.add(observationObj);
+        List<Edge> observationMax = new ArrayList<>();
+        double sum =0;
+        for (int i =0; i < obSet.size();i++){
+            sum +=obSet.get(i).getWmin();
+            if (sum <= RC) {
+                observationMax.add(obSet.get(i));
+            }
+        }
+
+        bState = new BState(t, B.get(t), RC, getRS(t), getRD(t), kt, N);
+        Observation observationObj2 = new Observation(observationMax, action, bState, E, N, t);
+        if (observationMax.size()>0)
+        result.add(observationObj2);
+
+        return result;
+    }
+
+/*
+
+
+
     public List<Observation> getAllObservations(List<Edge> action, int t) {
         // observation is supposed to contain only w_i_j, but here I use edges, it's easier to find w_ij and beta of the corresponding w_ij.
         List<Observation> result = new ArrayList<>();
@@ -195,34 +290,55 @@ public class Graph {
         List<List<Edge>> allCombinations = new ArrayList<>();
         List<Edge> edges = new ArrayList<>();
 
-
         getAllSequences(edges, action, allCombinations, 0);
 
         double min = Double.MAX_VALUE;
+        //   double min = Double.MAX_VALUE;
         List<Edge> eachObs = new ArrayList<>();
         for (int i = 0; i < allCombinations.size(); i++) {
             List<Edge> each = allCombinations.get(i);
             if (each.size() == 0) continue;
             double eachSum = Utility.getWSum( each);
-            if (min > eachSum) {
+            if (min < eachSum) {
                 eachObs = each;
                 min = eachSum;
+            }
+        }
+
+        List<Edge> observation = getObservation(eachObs, t);
+
+        bState = new BState(t, B.get(t), RC, getRS(t), getRD(t), kt, N);
+
+        Observation observationObj = new Observation(observation, action, bState, E, N, t);
+        result.add(observationObj);
+
+        double max = Double.MIN_VALUE;
+        //   double min = Double.MAX_VALUE;
+      //  List<Edge> eachObs = new ArrayList<>();
+        for (int i = 0; i < allCombinations.size(); i++) {
+            List<Edge> each = allCombinations.get(i);
+            if (each.size() == 0) continue;
+            double eachSum = Utility.getWSum( each);
+            if (max > eachSum) {
+                eachObs = each;
+                max = eachSum;
             }
         }
 
         if (eachObs.size() ==0) {
             System.out.println("observation is empty for action:  " + action );
         }
-        List<Edge> observation = getObservation(eachObs, t);
+       observation = getObservation(eachObs, t);
 
         bState = new BState(t, B.get(t), RC, getRS(t), getRD(t), kt, N);
 
-        Observation observationObj = new Observation(observation, action, bState, E, N, t);
+        observationObj = new Observation(observation, action, bState, E, N, t);
 
         result.add(observationObj);
         System.out.println("observation size: " + result.size());
         return result;
     }
+*/
 
 
     /**
@@ -1230,10 +1346,11 @@ Tij
         double v = 0;
             for (List<Edge> eachAction : actions) {
                 System.out.println("action " + a++);
+                if (actions == null )continue;
                 try {
                     int c = 0;
                     int temp = 0;
-                    List<Observation> observatons = graph.getAllObservations(eachAction, t);
+                    List<Observation> observatons = graph.getAllObservations(eachAction,  graph.UB.get(t), graph.U.get(t), t);
                     System.out.println("observation size:  " + observatons.size());
                     for (Observation eachObservation : observatons) {
                         // System.out.println("observation " + c++);
@@ -1243,15 +1360,19 @@ Tij
                         eachObservation.bState = bState;
                         eachObservation.update();
 
-                        graph.B.add(eachObservation.B);
-                        graph.UB.add(eachObservation.UB);
-                        graph.U.add(eachObservation.U);
+                        graph.B.set(t+1, eachObservation.B);
+                        graph.UB.set(t+1, eachObservation.UB);
+                        graph.RB.set(t+1, eachObservation.RB);
+                        graph.U.set(t+1, eachObservation.U);
                         BState tempState = graph.bState;
                         graph.bState = eachObservation.bState;
+                        t = t+1;
                         v += getV(curr + 1, graph, steps);
-                        graph.B.remove(eachObservation.B);
-                        graph.UB.remove(eachObservation.UB);
-                        graph.U.remove(eachObservation.U);
+                        t = t -1;
+                        graph.B.set(t+1, new ArrayList<>());
+                        graph.UB.set(t+1, new ArrayList<>());
+                        graph.RB.set(t+1, new ArrayList<>());
+                        graph.U.set(t+1, new ArrayList<>());
                         graph.bState = tempState;
 
                     }

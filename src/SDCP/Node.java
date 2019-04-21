@@ -35,6 +35,14 @@ public class Node {
         this.type = type;
         this.RS.put(0, RS);
         this.RD.put(0,RD);
+        this.RS.put(1, RS);
+        this.RD.put(1,RD);
+        this.RS.put(2, RS);
+        this.RD.put(2,RD);
+        this.RS.put(3, RS);
+        this.RD.put(3,RD);
+        this.RS.put(4, RS);
+        this.RD.put(4,RD); // TODO: need to update RS and RD.
         this.mu = mu;
         this.lamda.put(0, lamda);
         this.Yt.put(0, Yt);

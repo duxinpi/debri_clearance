@@ -522,7 +522,7 @@ public class Utility {
                 }
             }
             b[row + i.getId() - 1] = observation.bState.RS_t[i.getId()-1];
-            System.out.println("---rs------" + observation.bState.RS_t[i.getId()-1]);
+         //   System.out.println("---rs------" + observation.bState.RS_t[i.getId()-1]);
         }
 
       //  System.out.println("1.5-----------");
@@ -532,7 +532,7 @@ public class Utility {
             A[row + i.getId() - 1][nK + i.getId() - 1] = 1;
             //     System.out.println("line number: row + i.getId() - 1 positive: " + (row + i.getId() - 1));
             b[row + i.getId() - 1] = i.getRd(t);
-            System.out.println("---- RD: " + i.getRd(t));
+         //   System.out.println("---- RD: " + i.getRd(t));
         }
 
 
@@ -828,6 +828,55 @@ public class Utility {
         }
         return res;
     }
+
+    public static List<Integer> getNodeIndex(List<Edge> edges) {
+        Set<Integer> set = new HashSet<>();
+        for (Edge each : edges) {
+            set.add(each.getI());
+            set.add(each.getJ());
+        }
+        return new ArrayList<>(set);
+    }
+
+
+    //public static List<Node> getNodes(lis)
+
+
+    public static Node getNode(int key, List<Node> node) {
+
+        for (int i =0; i < node.size(); i++) {
+            if (node.get(i).getId() == key) {
+                return node.get(i);
+            }
+        }
+        return null;
+    }
+
+
+    public static List<Integer> NeighbourNodes(int id, List<Edge> edges) {
+        List<Integer> res = new ArrayList<>();
+        for(Edge each: edges) {
+            if (each.getJ() == id ) {
+                res.add(each.getI());
+            }else if (each.getI() == id) {
+                res.add(each.getJ());
+            }
+        }
+        return res;
+    }
+
+
+    public static List<Edge> getNeighbours(int id, List<Edge> edges) {
+        List<Edge> res = new ArrayList<>();
+        for(Edge each: edges) {
+            if (each.getJ() == id || each.getI()==id) {
+                res.add(each);
+            }
+        }
+        return res;
+    }
+
+
 
     public static void getAllSequences(List<Edge> edges, List<Edge> current, List<List<Edge>> result, int k) {
         if (k == current.size()) {
