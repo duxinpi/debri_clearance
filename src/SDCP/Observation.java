@@ -74,19 +74,6 @@ public class Observation  {
                 RB.remove(action.get(i));
             }
         }
-    /*    //update B
-        for (int i = 0; i < E.size(); i++) {
-            boolean contains = false;
-            for (int j = 0; j < U.size(); j++) {
-                if (U.get(j).equals(E.get(i))) {
-                    contains = true;
-                    break;
-                }
-            }
-            if (!contains) {
-                B.remove(E.get(i));
-            }
-        }*/
         //update RB
         for (int i = 0; i < observation.size(); i++) {
             RB.add(observation.get(i));
@@ -114,18 +101,7 @@ public class Observation  {
 
         // todo: update beta for RB.
     }
-/*
-    public List<List<Edge>> getUprimeList(){
-        List<List<Edge>> allCombinations = new ArrayList<>();
-        List<Edge> edges = new ArrayList<>();
-        Utility.getAllSequences(edges, action, allCombinations, 0);
-        return allCombinations;
-    }
 
-    public List<Edge> getUprimeNext(List<Edge> uprime){
-        List<Edge> resultSet = Utility.exclude(observation, uprime);
-        return resultSet;
-    }*/
 
     public List<Edge> getUprime(){
         return action;
@@ -152,5 +128,11 @@ public class Observation  {
         return Utility.exclude(observation, action);
     }
 
-
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (Edge each : observation) {
+            sb.append(each.getI() + "-" +  each.getJ() + "-");
+        }
+        return sb.toString();
+    }
 }

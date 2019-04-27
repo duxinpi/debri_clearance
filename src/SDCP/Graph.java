@@ -11,8 +11,13 @@ import static SDCP.GlobalData.*;
 public class Graph {
     private List<Edge> E;
     private List<Node> N;
-    int R = 20;
+    int R = 1;
     public int t = 0;
+
+    double max = -1;
+    List<Edge> bestAction = null;
+    Set<String> visitedAction = new HashSet<>();
+    Set<String> visitedObservation = new HashSet<>();
 
     List<List<Edge>> B = new ArrayList<>();
     List<List<Edge>> U = new ArrayList<>();
@@ -24,7 +29,7 @@ public class Graph {
 
 
     public Graph() {
-        kt = 20;
+        kt = 1;
         RC = kt;
     }
 
@@ -367,6 +372,7 @@ public class Graph {
         Utility.printArray(observation.observation);
         double z = 0;
         z = getZ(this, t, observation);
+        System.out.println("-------get Z ------:  " +z);
 
         double result = 0;
         for (Node d : getNd()) {
@@ -374,7 +380,9 @@ public class Graph {
             result += bi[i] * (d.getRd(0) - d.getRd(t));
         }
         result += z;
-        System.out.println("-------get Z ------" + result);
+        System.out.println("-------get v------:  " + Math.abs(result));
+
+
         return result;
     }
 
@@ -534,20 +542,24 @@ public class Graph {
     public void initNodes() {
         N = new ArrayList<>();
 
-        Node d1 = new Node(1, "d", 0, 200, 0, 0, 0, 56);
+        Node d1 = new Node(1, "d", 0, 200, 23.99, 4.1, 0, 56);
+        String r0N1= "0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52";
+        d1.setR0(converStringToArray(r0N1));
         N.add(d1);
 
-        Node t2 = new Node(2, "t", 0, 0, 0, 0, 0, 0);
+        Node t2 = new Node(2, "t", 0, 0, 23.99, 4.2, 0, 0);
+        String r0N2 = "0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52";
+        t2.setR0(converStringToArray(r0N2));
         N.add(t2);
 
-        Node t3 = new Node(3, "t", 0, 0, 23.99, 4.14, 1, 0);
+        Node t3 = new Node(3, "t", 0, 0, 23.99, 4.14, 0, 0);
         String r0N3 = "0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52";
         t3.setR0(converStringToArray(r0N3));
-
+        t3.setR0(converStringToArray(r0N3));
         N.add(t3);
 
 
-        Node s4 = new Node(4, "s", 300, 0, 20.64, 3.30, 1, 0);
+        Node s4 = new Node(4, "s", 300, 0, 20.64, 3.30, 5, 0);
         String r0N4 = "0.64\t3.68\t7.31\t11.19\t15.22\t19.36\t0.64\t3.68\t7.31\t11.19\t15.22\t19.36\t0.64\t3.68\t7.31\t11.19\t15.22\t19.36\t0.64\t3.68\t7.31\t11.19\t15.22\t19.36\t0.64\t3.68\t7.31\t11.19\t15.22\t19.36";
         s4.setR0(converStringToArray(r0N4));
         N.add(s4);
@@ -556,7 +568,7 @@ public class Graph {
         Resource resource5 = new Resource();
         resource5.put(1, 50);
         resource5.put(2, 100);
-        Node s5 = new Node(5, "s", 200, 0, 21.75, 4.78, 1, 0);
+        Node s5 = new Node(5, "s", 200, 0, 21.75, 4.78, 2, 0);
         String r0N5 = "1.16\t4.38\t8.07\t11.99\t16.04\t20.19\t1.16\t4.38\t8.07\t11.99\t16.04\t20.19\t1.16\t4.38\t8.07\t11.99\t16.04\t20.19\t1.16\t4.38\t8.07\t11.99\t16.04\t20.19\t1.16\t4.38\t8.07\t11.99\t16.04\t20.19";
         s5.setR0(converStringToArray(r0N5));
         N.add(s5);
@@ -573,59 +585,104 @@ public class Graph {
         d7.setR0(converStringToArray(r0N7));
         N.add(d7);
 
-        Node t8 = new Node(8, "t", 0, 300, 24.71, 3.30, 0, 0);
+        Node t8 = new Node(8, "t", 0, 0, 24.71, 3.30, 0, 0);
+        String r0N8 = "0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52";
+        t8.setR0(converStringToArray(r0N8));
+
         N.add(t8);
-        Node t9 = new Node(9, "t", 0, 300, 24.71, 3.30, 0, 0);
+        Node t9 = new Node(9, "t", 0, 0, 24.71, 3.30, 0, 0);
+        String r0N9 = "0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52";
+
+        t9.setR0(converStringToArray(r0N9));
         N.add(t9);
-        Node t10 = new Node(10, "t", 0, 300, 24.71, 3.30, 0, 0);
+        Node t10 = new Node(10, "t", 0, 0, 24.71, 3.30, 0, 0);
+        String r0N10= "0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52";
+        t10.setR0(converStringToArray(r0N10));
+
         N.add(t10);
 
-        Node t11 = new Node(11, "t", 0, 200, 0, 0, 0, 56);
+        Node t11 = new Node(11, "t", 0, 0, 24.71,3.30 , 0, 56);
+        String r0N11= "0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52";
+        t2.setR0(converStringToArray(r0N2));
+
         N.add(t11);
 
-        Node t12 = new Node(12, "t", 0, 0, 0, 0, 0, 0);
+        Node t12 = new Node(12, "t", 0, 0, 24.71, 3.300, 0, 0);
 
+        String r0N12= "0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52";
+        t12.setR0(converStringToArray(r0N12));
 
-        Node t13 = new Node(13, "t", 0, 0, 23.99, 4.14, 1, 0);
-        String r0N13 = "0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52";
-        t3.setR0(converStringToArray(r0N13));
         N.add(t12);
+
+        Node t13 = new Node(13, "t", 0, 0, 23.99, 4.14, 0, 0);
+        String r0N13 = "0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52";
+        t13.setR0(converStringToArray(r0N13));
         N.add(t13);
 
 
-        Node s14 = new Node(14, "t", 300, 0, 20.64, 3.30, 1, 0);
+        Node s14 = new Node(14, "t", 300, 0, 20.64, 3.30, 0, 0);
         N.add(s14);
+        String r0N14 = "0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52";
+        s14.setR0(converStringToArray(r0N14));
 
 
-        Node s15 = new Node(15, "t", 200, 0, 21.75, 4.78, 1, 0);
+        Node s15 = new Node(15, "t", 200, 0, 21.75, 4.78, 0, 0);
+        String r0N15= "0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52";
+        s15.setR0(converStringToArray(r0N15));
         N.add(s15);
 
 
-        Node t16 = new Node(16, "t", 0, 0, 23, 6.69, 0, 0);
+        Node t16 = new Node(16, "s", 0, 0, 23, 6.69, 0, 0);
+        String r0N16= "0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52";
+        t16.setR0(converStringToArray(r0N16));
         N.add(t16);
 
 
-        Node d17 = new Node(17, "t", 0, 300, 24.71, 3.30, 0, 100);
-        N.add(d17);
+        Node t17 = new Node(17, "t", 0, 0, 24.71, 3.30, 0, 100);
+        String r0N17= "0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52";
+        t17.setR0(converStringToArray(r0N17));
+        N.add(t17);
 
-        Node t18 = new Node(18, "t", 0, 300, 24.71, 3.30, 0, 0);
+        Node t18 = new Node(18, "t", 0, 0, 24.71, 3.30, 0, 0);
+        String r0N18 = "0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52";
+        t18.setR0(converStringToArray(r0N18));
         N.add(t18);
-        Node t19 = new Node(19, "t", 0, 300, 24.71, 3.30, 0, 0);
+        Node t19 = new Node(19, "t", 0, 0, 24.71, 3.30, 0, 0);
+        String r0N19= "0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52";
+        t19.setR0(converStringToArray(r0N19));
         N.add(t19);
-        Node t20 = new Node(20, "t", 0, 300, 24.71, 3.30, 0, 0);
+        Node t20 = new Node(20, "t", 0, 0, 24.71, 3.30, 0, 0);
+        String r0N20 = "0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52";
+
+        t20.setR0(converStringToArray(r0N20));
         N.add(t20);
-        Node t21 = new Node(21, "t", 0, 300, 24.71, 3.30, 0, 0);
+        Node t21 = new Node(21, "t", 0, 0, 24.71, 3.30, 0, 0);
+        String r0N21 = "0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52";
+
+        t21.setR0(converStringToArray(r0N21));
         N.add(t21);
 
-        Node t22 = new Node(22, "t", 0, 300, 24.71, 3.30, 0, 0);
+        Node t22 = new Node(22, "t", 0, 0, 24.71, 3.30, 0, 0);
+        String r0N22 = "0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52";
+
+        t22.setR0(converStringToArray(r0N22));
         N.add(t22);
 
-        Node t23 = new Node(23, "t", 0, 300, 24.71, 3.30, 0, 0);
+        Node t23 = new Node(23, "t", 0, 0, 24.71, 3.30, 0, 0);
+        String r0N23 = "0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52";
+
+        t23.setR0(converStringToArray(r0N23));
         N.add(t23);
-        Node t24 = new Node(24, "t", 0, 300, 24.71, 3.30, 0, 0);
+        Node t24 = new Node(24, "t", 0, 0, 24.71, 3.30, 0, 0);
+        String r0N24= "0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52";
+
+        t24.setR0(converStringToArray(r0N24));
         N.add(t24);
-        Node t25 = new Node(25, "d", 0, 300, 24.71, 3.30, 0, 0);
-        N.add(t25);
+        Node d25 = new Node(25, "d", 0, 300, 24.71, 3.30, 0, 24);
+        String r0N25 = "0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52\t0.22\t3.01\t6.56\t10.4\t14.41\t18.52";
+
+        d25.setR0(converStringToArray(r0N25));
+        N.add(d25);
 
 
      /*   N = new ArrayList<>();
@@ -696,104 +753,104 @@ Tij
 
     public void initEdges() {
         E = new ArrayList<>();
-        Edge edge12 = new Edge(1, 2, 0, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
+        Edge edge12 = new Edge(1, 2, 100, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
         E.add(edge12);
-        Edge edge15 = new Edge(1, 5, 0, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
+        Edge edge15 = new Edge(1, 5, 100, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
         E.add(edge15);
 
-        Edge edge23 = new Edge(2, 3, 0, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
+        Edge edge23 = new Edge(2, 3, 100, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
         E.add(edge23);
-        Edge edge24 = new Edge(2, 4, 0, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
+        Edge edge24 = new Edge(2, 4, 100, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
         E.add(edge24);
 
 
-        Edge edge34 = new Edge(3, 4, 0, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
+        Edge edge34 = new Edge(3, 4, 100, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
         E.add(edge34);
 
         Edge edge39 = new Edge(3, 9, 100, 1.26, 0.03, new double[]{0.5, 0.3}, new double[]{0.5, 0.5});
         E.add(edge39);
 
-        Edge edge45 = new Edge(4, 5, 0, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
+        Edge edge45 = new Edge(4, 5, 100, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
         E.add(edge45);
-        Edge edge47 = new Edge(4, 7, 0, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
+        Edge edge47 = new Edge(4, 7, 100, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
         E.add(edge47);
-        Edge edge48 = new Edge(4, 8, 0, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
+        Edge edge48 = new Edge(4, 8, 100, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
         E.add(edge48);
-        Edge edge49 = new Edge(4, 9, 0, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
+        Edge edge49 = new Edge(4, 9, 100, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
         E.add(edge49);
-        Edge edge56 = new Edge(5, 6, 0, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
+        Edge edge56 = new Edge(5, 6, 100, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
         E.add(edge56);
-        Edge edge57 = new Edge(5, 7, 0, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
+        Edge edge57 = new Edge(5, 7, 100, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
         E.add(edge57);
-        Edge edge67 = new Edge(6, 7, 0, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
+        Edge edge67 = new Edge(6, 7, 100, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
         E.add(edge67);
-        Edge edge78 = new Edge(7, 8, 0, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
+        Edge edge78 = new Edge(7, 8, 100, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
         E.add(edge78);
-        Edge edge711 = new Edge(7, 11, 0, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
+        Edge edge711 = new Edge(7, 11, 100, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
         E.add(edge711);
-        Edge edge712 = new Edge(7, 12, 0, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
+        Edge edge712 = new Edge(7, 12, 100, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
         E.add(edge712);
-        Edge edge89 = new Edge(8, 9, 0, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
+        Edge edge89 = new Edge(8, 9, 100, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
         E.add(edge89);
-        Edge edge810 = new Edge(8, 10, 0, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
+        Edge edge810 = new Edge(8, 10, 100, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
         E.add(edge810);
-        Edge edge811 = new Edge(8, 11, 0, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
+        Edge edge811 = new Edge(8, 11, 100, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
         E.add(edge811);
-        Edge edge813 = new Edge(8, 13, 0, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
+        Edge edge813 = new Edge(8, 13, 100, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
         E.add(edge813);
 
-        Edge edge910 = new Edge(9, 10, 0, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
+        Edge edge910 = new Edge(9, 10, 100, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
         E.add(edge910);
-        Edge edge1013 = new Edge(10, 13, 0, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
+        Edge edge1013 = new Edge(10, 13, 100, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
         E.add(edge1013);
-        Edge edge1014 = new Edge(10, 14, 0, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
+        Edge edge1014 = new Edge(10, 14, 100, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
         E.add(edge1014);
-        Edge edge1112 = new Edge(11, 12, 0, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
+        Edge edge1112 = new Edge(11, 12, 100, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
         E.add(edge1112);
-        Edge edge1113 = new Edge(11, 13, 0, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
+        Edge edge1113 = new Edge(11, 13, 100, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
         E.add(edge1113);
-        Edge edge1116 = new Edge(11, 16, 0, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
+        Edge edge1116 = new Edge(11, 16, 100, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
         E.add(edge1116);
 
-        Edge edge1215 = new Edge(12, 15, 0, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
+        Edge edge1215 = new Edge(12, 15, 100, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
         E.add(edge1215);
-        Edge edge1216 = new Edge(12, 16, 0, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
+        Edge edge1216 = new Edge(12, 16, 100, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
         E.add(edge1216);
-        Edge edge1314 = new Edge(13, 14, 0, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
+        Edge edge1314 = new Edge(13, 14, 100, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
         E.add(edge1314);
-        Edge edge1319 = new Edge(13, 19, 0, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
+        Edge edge1319 = new Edge(13, 19, 100, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
         E.add(edge1319);
-        Edge edge1419 = new Edge(14, 19, 0, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
+        Edge edge1419 = new Edge(14, 19, 100, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
         E.add(edge1419);
-        Edge edge1421 = new Edge(14, 21, 0, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
+        Edge edge1421 = new Edge(14, 21, 100, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
         E.add(edge1421);
-        Edge edge1422 = new Edge(14, 22, 0, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
+        Edge edge1422 = new Edge(14, 22, 100, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
         E.add(edge1422);
 
-        Edge edge1516 = new Edge(15, 16, 0, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
+        Edge edge1516 = new Edge(15, 16, 100, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
         E.add(edge1516);
 
-        Edge edge1617 = new Edge(16, 17, 0, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
+        Edge edge1617 = new Edge(16, 17, 100, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
         E.add(edge1617);
 
-        Edge edge1718 = new Edge(17, 18, 0, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
+        Edge edge1718 = new Edge(17, 18, 100, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
         E.add(edge1718);
-        Edge edge1719 = new Edge(17, 19, 0, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
+        Edge edge1719 = new Edge(17, 19, 100, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
         E.add(edge1719);
 
-        Edge edge1820 = new Edge(18, 20, 0, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
+        Edge edge1820 = new Edge(18, 20, 100, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
         E.add(edge1820);
 
-        Edge edge1920 = new Edge(19, 20, 0, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
+        Edge edge1920 = new Edge(19, 20, 100, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
         E.add(edge1920);
 
-        Edge edge2021 = new Edge(20, 21, 0, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
+        Edge edge2021 = new Edge(20, 21, 100, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
         E.add(edge2021);
-        Edge edge2223 = new Edge(22, 23, 0, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
+        Edge edge2223 = new Edge(22, 23, 100, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
         E.add(edge2223);
-        Edge edge2324 = new Edge(23, 24, 0, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
+        Edge edge2324 = new Edge(23, 24, 100, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
         E.add(edge2324);
-        Edge edge2425 = new Edge(24, 25, 0, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
+        Edge edge2425 = new Edge(24, 25, 100, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
         E.add(edge2425);
 
      /*   Edge edge34 = new Edge(3, 4,  0, 0.94, 0.04, new double[]{4, 5},new double[]{0.5, 0.5} );
@@ -932,10 +989,15 @@ Tij
 
     public double[][] getFC() {
         double[][] result = new double[N.size()][N.size()];
-        result[3][2] = 100;
-        result[4][2] = 200;
-        result[4][5] = 20;
-        result[5][6] = 200;
+        for (Edge edge : E) {
+            result[edge.getI() - 1][edge.getJ() - 1] = edge.getFC_ij();
+            result[edge.getJ() - 1][edge.getI() - 1] = edge.getFC_ij();
+        }
+     //   result[3][2] = 100;
+     //   result[4][2] = 200;
+     //   result[4][5] = 20;
+     //   result[5][6] = 200;
+
         return result;
     }
 
@@ -1094,7 +1156,6 @@ Tij
                 break;
             }
         }
-
         converToActions(path, actions, action, remaining, k + 1);
 
     }
@@ -1331,14 +1392,12 @@ Tij
             each.Yt.put(t, each.getYt(0));
         }
     }*/
-    List<Edge> bestAction;
 
     public double getV(int curr, Graph graph, int steps) {
         if (curr == steps) {
             return 0;
         }
 
-        double max = -1;
         List<List<Edge>> actions = graph.getAllFeasibleActions(t);
         int a = 0;
         double maxV1 = 0;
@@ -1354,6 +1413,8 @@ Tij
                     System.out.println("observation size:  " + observatons.size());
                     for (Observation eachObservation : observatons) {
                         // System.out.println("observation " + c++);
+                        if (visitedAction.contains(Utility.getString(eachAction) + "~" +eachObservation.toString()))continue;
+                        visitedAction.add(Utility.getString(eachAction) + "~" +eachObservation.toString());
                         v += graph.getPofObservation(eachObservation) * graph.getReward(eachObservation, t);
                         temp += v;
                         bState = new BState(eachAction, eachObservation);
@@ -1376,16 +1437,13 @@ Tij
                         graph.bState = tempState;
 
                     }
-
-                    if (v > max) {
-                        max = v;
+                    if ( Math.abs(v) >max&& curr==0) {
                         this.bestAction = eachAction;
-                        System.out.println("V1 value: " + temp);
-                        System.out.println("V2 value: " + (v - temp));
-                        maxV1 = temp;
-                        maxV2 = v - temp;
-                        Utility.printArray(eachAction);
+                        System.out.println("~~found best action ~");
+                        Utility.printArray(bestAction);
+                        max = Math.abs(v);
                     }
+
                 } catch (IloException e) {
                     e.printStackTrace();
                 }
@@ -1424,7 +1482,7 @@ Tij
 
         //    System.out.println(" ---  all actions: " + graph.getAllSequences(graph.E));
         //  System.out.println(graph.getAllFeasibleActions(0).size());
-      /*  try {
+        /*  try {
           //  System.out.print("test ...:"+ graph.getBenefit(0));
             graph.getBenefit(0);
         } catch (IloException e) {

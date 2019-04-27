@@ -3,8 +3,8 @@ package SDCP;
 
 
 public class Edge {
-    private int i;
-    private int j;
+    public int i;
+    public int j;
 
     private int edgeType; // B, UB, RB, U
 
@@ -82,4 +82,11 @@ public class Edge {
         return min;
     }
 
+    public double getFC_ij() {
+        return FC_ij;
+    }
+
+    public void setFC_ij(double FC_ij) {
+        this.FC_ij = FC_ij;
+    }
 }

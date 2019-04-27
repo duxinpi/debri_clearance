@@ -94,6 +94,10 @@ return null;
         List<int[]> edges = new ArrayList<>();
         Set<String> set = new HashSet<>();
         List<int[]> shortPath = pathsMatrix[src][des];
+
+
+
+
         double sum =0;
         for (int i =0; shortPath !=null && i <   shortPath.size() ; i++){
             sum += shortestPathCostMatrix[shortPath.get(i)[0]][shortPath.get(i)[1]];
@@ -117,6 +121,9 @@ return null;
                 }
             }
         }
+
+
+
         return edges;
     }
 

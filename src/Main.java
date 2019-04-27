@@ -1,19 +1,8 @@
-import CPLEXUtil.cplexutils.CplexParameterSetter;
+
 import SDCP.*;
 
-import ilog.concert.IloException;
-import ilog.concert.IloLinearNumExpr;
-import ilog.concert.IloNumVar;
-import ilog.concert.IloNumVarType;
-import ilog.cplex.IloCplex;
+import java.util.*;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import static SDCP.Utility.*;
-import static org.junit.Assert.fail;
 
 public class Main {
 
@@ -47,9 +36,33 @@ public class Main {
         }
     }
 
+    public static int minAreaRect(int[][] points) {
+        TreeMap<Integer, Set<Integer>> map = new TreeMap<>();
+        for (int[] each : points) {
+            if (!map.containsKey(each[0])){
+                map.put(each[0], new TreeSet<>());
+            } map.get(each[0]).add(each[1]);
+        }
+
+        int min = Integer.MAX_VALUE;
+
+        for(int i =0; i < points.length; i++) {
+            for (int j =0; j< points.length; j++) {
+                if (points[i][0] == points[j][0])continue;
+                if (points[i][1] == points[j][1]) continue;
+
+                int area = Math.abs(points[i][0] - points[j][0]) *  Math.abs(points[i][1] - points[j][1]);
+                min = Math.min(area, min);
+            }
+
+        }
+        if (min == Integer.MAX_VALUE) return 0;
+        return min;
+    }
+
     public static void main(String args[]) {
-
-
+        int[][] points= {{1,1,},{1,3},{3, 1}, {3, 3}, {2,2}};
+        minAreaRect( points);
 
         String[] source = {"/*Test program */", "int main()", "{ ", "  // variable declaration ", "int a, b, c;", "/* This is a test", "   multiline  ", "   comment for ", "   testing */", "a = b + c;", "}"};
 
@@ -71,12 +84,7 @@ public class Main {
             e.printStackTrace();
         }
 */
-
     }
-
-
-
-
 
 
 }

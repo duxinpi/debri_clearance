@@ -108,6 +108,7 @@ public class Utility {
 */
 
     public static void main(String ars[]) {
+
         // generateParenthesis(3);
 
 
@@ -325,10 +326,12 @@ public class Utility {
     public static Edge getEdge(List<Edge> edges, int i, int j){
         for (Edge each : edges){
             if (each.getJ() == j && each.getI() == i){
-                return  each;
+                Edge newEdge = new Edge( i,  j, each.getFC_ij(),  each.getT(), each.getR(), each.w_ij,each.beta);
+                return  newEdge;
             }
             if (each.getI() == j && each.getJ() == i){
-                return  each;
+                Edge newEdge = new Edge( i,  j, each.getFC_ij(),  each.getT(), each.getR(), each.w_ij,each.beta);
+                return  newEdge;
             }
         }
         return null;
@@ -401,8 +404,6 @@ public class Utility {
         }
 
        // printArray(f);
-
-
         // 1.2
         int row = 0;
       //  System.out.println("1.2-----------------");
@@ -755,7 +756,7 @@ public class Utility {
 
             }
             double X[][] = Matrix.transpose(Matrix.reshape(xDouble, 0, nY, N));
-      //      printDoubleArray(X);
+            printDoubleArray(X);
             double [][]Y = null;
 
             if (unique(Cj).length ==1) {
@@ -869,8 +870,13 @@ public class Utility {
     public static List<Edge> getNeighbours(int id, List<Edge> edges) {
         List<Edge> res = new ArrayList<>();
         for(Edge each: edges) {
-            if (each.getJ() == id || each.getI()==id) {
-                res.add(each);
+            if (each.getI()==id) {
+                Edge newEdge = new Edge( each.i, each.getJ(), each.getFC_ij(),  each.getT(), each.getR(), each.w_ij,each.beta);
+                res.add(newEdge);
+            } else if ( each.getJ() == id){
+
+                Edge newEdge = new Edge( each.getJ(), each.getI(), each.getFC_ij(),  each.getT(), each.getR(), each.w_ij,each.beta);
+                res.add(newEdge);
             }
         }
         return res;
@@ -890,6 +896,14 @@ public class Utility {
             edges.remove(e);
         }
         return ;
+    }
+
+    public static String getString(List<Edge> edges){
+        StringBuilder sb = new StringBuilder();
+        for (Edge each : edges) {
+            sb.append(each.getI() +"-" + each.getJ());
+        }
+        return sb.toString();
     }
 
 
