@@ -83,6 +83,9 @@ public class Utility {
             if (each.getI() == m && each.getJ() == n) {
                 return true;
             }
+            if (each.getJ() == m && each.getI() == n) {
+                return true;
+            }
         }
         return false;
     }
@@ -132,7 +135,6 @@ public class Utility {
         for (int i =0; i < matlabA.length; i++) {
             for (int j =0; j < matlabA[0].length; j++) {
                 if (Math.abs(matlabA[i][j]- javaA[i][j]) >0.01){
-
                     System.out.println("file: " + file1 + "diff: " + i + "-----" + j + " : " + matlabA[i][j] +"----java---" + javaA[i][j]);
                 }
             }
@@ -349,7 +351,7 @@ public class Utility {
     }
 
 
-    public static double getZ(Graph graph, int t, Observation observation) throws IloException {
+    public static double getZ(Graph graph, int t, Observation observation, List<double[]> bestX ) throws IloException {
 
         int N = graph.getNsize();
         int nX = 0;
@@ -432,7 +434,8 @@ public class Utility {
         //1.4
 
 
-        row += graph.getNsize();
+
+       row += graph.getNsize();
 
         for (Node i : graph.getNT()) {
 
@@ -529,7 +532,7 @@ public class Utility {
       //  System.out.println("1.5-----------");
         //1.5
         row = row + N;
-        for (Node i : graph.getNd()) {
+       for (Node i : graph.getNd()) {
             A[row + i.getId() - 1][nK + i.getId() - 1] = 1;
             //     System.out.println("line number: row + i.getId() - 1 positive: " + (row + i.getId() - 1));
             b[row + i.getId() - 1] = i.getRd(t);
@@ -714,10 +717,8 @@ public class Utility {
             for (int i = 0; i < Aeq.length; i++) {
                 IloLinearNumExpr constraint1 = model.linearNumExpr();
                 for (int j = 0; j < Aeq[0].length; j++) {
-
                     constraint1.addTerm(Aeq[i][j], x[j]);
                 }
-
                 model.addEq(constraint1, beq[i]);
 
             }
@@ -754,6 +755,12 @@ public class Utility {
             for (int i =0; i < xDouble.length; i++) {
                 xDouble[i] = model.getValue(x[i]);
 
+            }
+
+            bestX.add(0, xDouble);
+
+            if(bestX.size()> 1) {
+                bestX.remove(1);
             }
             double X[][] = Matrix.transpose(Matrix.reshape(xDouble, 0, nY, N));
             printDoubleArray(X);
@@ -806,7 +813,7 @@ public class Utility {
         }
 
 
-        return model.getObjValue();
+        return -model.getObjValue();
     }
 
     public static void printArray(List<Edge> edges) {
@@ -884,6 +891,7 @@ public class Utility {
 
 
 
+
     public static void getAllSequences(List<Edge> edges, List<Edge> current, List<List<Edge>> result, int k) {
         if (k == current.size()) {
             return ;
@@ -906,6 +914,16 @@ public class Utility {
         return sb.toString();
     }
 
+
+    public static double getSumCj(Node node, double B) {
+        double[]R0 = node.getR0();
+        double sum =0;
+        for (int i =1; i< B; i++) {
+            sum += (R0[i] - R0[i-1]);
+        }
+        return sum ;
+
+    }
 
 
 }
