@@ -11,7 +11,7 @@ import static SDCP.GlobalData.*;
 public class Graph {
     private List<Edge> E;
     private List<Node> N;
-    int R = 1;
+
     Dijsktra dijsktra;
     public int t = 0;
 
@@ -27,13 +27,12 @@ public class Graph {
     List<List<Edge>> UB = new ArrayList<>();
     List<List<Edge>> RB = new ArrayList<>();
     double kt;
-    double RC;
     BState bState;
 
 
     public Graph() {
-        kt = 1;
-        RC = kt;
+        kt = RC;
+
     }
 
 
@@ -110,7 +109,7 @@ public class Graph {
         for (Integer eachNode : nodeSet) {
             //  paths = dijsktra.dijkstra(getW(), eachNode - 1, demandNodesId);
             for (int i = 0; i < demandNodes.length; i++) {
-                List<int[]> extend = dijsktra.getExtendedPath(getW(), eachNode - 1, demandNodes[i].getId() - 1, R);
+                List<int[]> extend = dijsktra.getExtendedPath(getW(), eachNode - 1, demandNodes[i].getId() - 1, RC);
                 List<Edge> action = new ArrayList<>();
                 for (int[] each : extend) {
                     Edge edge = Utility.getEdge(remain, each[0] + 1, each[1] + 1);
@@ -202,7 +201,7 @@ public class Graph {
                 }
                 newAction.add(each);
                 double cost = B;
-                while (lamda1 <= rightSide&& cost>0) {
+                while (lamda1 <= rightSide && cost > 0) {
                     rightSide = node.getMu() * (node.getR0()[0] + Utility.getSumCj(node, cost));
                     cost--;
                 }
@@ -254,16 +253,16 @@ public class Graph {
             Edge minEdge = null;
             Edge maxEdge = null;
             for (Edge eachEdge : edges) {
-                if (eachEdge.getWmin()< min ){
+                if (eachEdge.getWmin() < min) {
                     minEdge = eachEdge;
                     min = eachEdge.getWmin();
                 }
-                if (eachEdge.getWmin()> max) {
+                if (eachEdge.getWmin() > max) {
                     maxEdge = eachEdge;
                     max = eachEdge.getWmin();
                 }
             }
-            if (min== Integer.MAX_VALUE){
+            if (min == Integer.MAX_VALUE) {
                 break;
             }
 
@@ -272,7 +271,7 @@ public class Graph {
             obEdges.add(minEdge);
             Observation observationObj = new Observation(obEdges, action, bState, E, N, t);
             result.add(observationObj);
-            if (minEdge!=maxEdge) {
+            if (minEdge != maxEdge) {
                 bState = new BState(t, B.get(t), RC, getRS(t), getRD(t), kt, N);
                 List<Edge> obEdges2 = new ArrayList<>();
                 obEdges2.add(maxEdge);
@@ -549,6 +548,8 @@ public class Graph {
         E = new ArrayList<>();
         List<List<String>> nodes = ExcelReader.read("./Doc/data.xlsx", 0);
         List<List<String>> edges = ExcelReader.read("./Doc/data.xlsx", 1);
+        List<List<String>> globalData = ExcelReader.read("./Doc/data.xlsx", 2);
+
         nodes.remove(0);
         edges.remove(0);
 
@@ -570,6 +571,13 @@ public class Graph {
             E.add(new Edge(Integer.parseInt(eachEdge.get(0)), Integer.parseInt(eachEdge.get(1)), Double.parseDouble(eachEdge.get(2)), Double.parseDouble(eachEdge.get(3)), Double.parseDouble(eachEdge.get(4)), new double[]{Double.parseDouble(eachEdge.get(5)), Double.parseDouble(eachEdge.get(6))}, new double[]{Double.parseDouble(eachEdge.get(7)), Double.parseDouble(eachEdge.get(8))}));
 
         }
+
+        GlobalData.B = Double.parseDouble(globalData.get(0).get(1));
+
+        GlobalData.RC = Integer.parseInt(globalData.get(1).get(1));
+
+        GlobalData.SIGMA = Double.parseDouble(globalData.get(2).get(1));
+        kt = RC;
 
     }
 
@@ -1481,7 +1489,7 @@ Tij
                 int c = 0;
                 int temp = 0;
                 List<Observation> observatons = graph.getAllObservations(eachAction, graph.UB.get(t), graph.U.get(t), t);
-                if (observatons.size() ==0) continue;
+                if (observatons.size() == 0) continue;
                 System.out.println("observation size:  " + observatons.size());
                 for (Observation eachObservation : observatons) {
                     // System.out.println("observation " + c++);
@@ -1556,7 +1564,7 @@ Tij
             System.out.println(edge.getI() + "----" + edge.getJ());
         }
 
-        System.out.print("BEST ACTION value: " + graph.max);
+        System.out.println("BEST ACTION value: " + graph.max);
         int N = graph.N.size();
         int nX = 0;
         int nY = N * N;
@@ -1567,8 +1575,8 @@ Tij
         int nK = nF + nY;
         int nKn = nK + N;
 
-     //   System.out.print("Best X, Y .........................................................");
-     //   Utility.printArray(graph.bestX);
+        //   System.out.print("Best X, Y .........................................................");
+        //   Utility.printArray(graph.bestX);
         double X[][] = Matrix.transpose(Matrix.reshape(graph.bestX, 0, nY, N));
         double Y[][] = null;
         double[] Cj = graph.getCj();
