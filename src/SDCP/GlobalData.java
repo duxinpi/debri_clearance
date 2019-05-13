@@ -7,5 +7,7 @@ public class GlobalData {
     public static double SIGMA = 0.2;
     public static int levels = 2;
     public static int RC = 1;
+    public static int policy = 1;
+    public static int lookAhead= 2;
 
 }

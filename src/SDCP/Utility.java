@@ -601,24 +601,26 @@ public class Utility {
 
         //1.9
         row = row + N * N;
-        for (Node j : observation.getNp()) {
-            for (Node i : observation.getNp()) {
-                A[row + j.getId() - 1][nX + (i.getId() - 1) * N + j.getId() - 1] = i.getLamda(t);
-            }
-
-            if (j.getId() > 1) {
-                A[row + j.getId() - 1][nY + (int) getSum(Cj, 0, j.getId() - 1) + 1 - 1] = -j.getR0()[0] * j.getMu();
-            } else {
-                A[row + j.getId() - 1][nY + 1 - 1] = -j.getR0()[0] * j.getMu();
-            }
-            for (int m = 2; m <= Cj[j.getId() - 1]; m++) {
-                if (j.getId() > 1) {
-                    A[row + j.getId() - 1][nY + (int) getSum(Cj, 0, j.getId() - 1) + m - 1] = j.getMu() * (-j.getR0()[m - 1] + j.getR0()[m - 1 - 1]);
-
-                } else {
-                    A[row + j.getId() - 1][nY + m - 1] = j.getMu() * (-j.getR0()[m - 1] + j.getR0()[m - 1 - 1]);
+        if (GlobalData.policy != 5) {
+            for (Node j : observation.getNp()) {
+                for (Node i : observation.getNp()) {
+                    A[row + j.getId() - 1][nX + (i.getId() - 1) * N + j.getId() - 1] = i.getLamda(t);
                 }
 
+                if (j.getId() > 1) {
+                    A[row + j.getId() - 1][nY + (int) getSum(Cj, 0, j.getId() - 1) + 1 - 1] = -j.getR0()[0] * j.getMu();
+                } else {
+                    A[row + j.getId() - 1][nY + 1 - 1] = -j.getR0()[0] * j.getMu();
+                }
+                for (int m = 2; m <= Cj[j.getId() - 1]; m++) {
+                    if (j.getId() > 1) {
+                        A[row + j.getId() - 1][nY + (int) getSum(Cj, 0, j.getId() - 1) + m - 1] = j.getMu() * (-j.getR0()[m - 1] + j.getR0()[m - 1 - 1]);
+
+                    } else {
+                        A[row + j.getId() - 1][nY + m - 1] = j.getMu() * (-j.getR0()[m - 1] + j.getR0()[m - 1 - 1]);
+                    }
+
+                }
             }
         }
 
@@ -918,6 +920,7 @@ public class Utility {
     public static double getSumCj(Node node, double B) {
         double[]R0 = node.getR0();
         double sum =0;
+
         for (int i =1; i< B; i++) {
             sum += (R0[i] - R0[i-1]);
         }

@@ -49,7 +49,7 @@ public class BState {
     }
 
     public void updateB() {
-        for (Edge each : B) {
+       /* for (Edge each : B) {
             if (Utility.contains(observation.UB, each)) {
                 for (int i =0 ; i< each.w_ij.length;i++){
                     each.beta[i] = each.beta[i]; //todo: udpate with gamma process.
@@ -67,7 +67,7 @@ public class BState {
                 }
 
             }
-        }
+        }*/
 
     }
 

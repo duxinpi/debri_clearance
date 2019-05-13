@@ -90,7 +90,7 @@ public class Observation  {
     }
 
     public void updateBstate() {
-        for (Edge e: UB){
+      /*  for (Edge e: UB){
             e.beta[0] = e.beta[0];
             e.beta[1] = e.beta[1];
         }
@@ -98,7 +98,7 @@ public class Observation  {
             e.beta[0] =1;
             e.beta[1] = 0;
         }
-
+*/
         // todo: update beta for RB.
     }
 
