@@ -8,6 +8,6 @@ public class GlobalData {
     public static int levels = 2;
     public static int RC = 1;
     public static int policy = 1;
-    public static int lookAhead= 2;
+    public static int lookAhead= 4;
 
 }

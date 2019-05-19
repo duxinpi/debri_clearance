@@ -131,7 +131,7 @@ public class Observation  {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         for (Edge each : observation) {
-            sb.append(each.getI() + "-" +  each.getJ() + "-");
+            sb.append(each.toString());
         }
         return sb.toString();
     }

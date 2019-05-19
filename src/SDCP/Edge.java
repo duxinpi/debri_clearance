@@ -52,12 +52,6 @@ public class Edge {
     }
 
 
-    @Override
-    public String toString() {
-        return ("[ " + i + " " + j +" ]");
-    }
-
-
     public double getT() {
         return T;
     }
@@ -88,5 +82,10 @@ public class Edge {
 
     public void setFC_ij(double FC_ij) {
         this.FC_ij = FC_ij;
+    }
+    @Override
+    public String toString(){
+        return (i <j)? i + "-"+j : j + "-" +i;
+
     }
 }
