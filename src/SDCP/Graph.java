@@ -679,6 +679,7 @@ public class Graph {
         GlobalData.SIGMA = Double.parseDouble(globalData.get(2).get(1));
         GlobalData.policy = Integer.parseInt(globalData.get(3).get(1));
         GlobalData.lookAhead = Integer.parseInt(globalData.get(4).get(1));
+        GlobalData.runTimes = Integer.parseInt(globalData.get(5).get(1));
 
         kt = RC;
 
@@ -1664,7 +1665,7 @@ Tij
         List<List<Edge>> bestActions = new ArrayList<>();
 
 
-        for (int i = 0; i < 12; i++) {
+        for (int i = 0; i < runTimes; i++) {
 
             graph.initGraph();
             graph.initBlocked();
@@ -1731,12 +1732,13 @@ Tij
 
             try (Writer writer = new BufferedWriter(new OutputStreamWriter(
                     new FileOutputStream(outPut + i + ".txt"), "utf-8"))) {
-                writer.write("Best X.........................................................\n");
+                writer.write("Best action result.........................................................\n");
 
 
                 for (Edge edge : action) {
                     writer.append(edge.getI() + "----" + edge.getJ() + "\n");
                 }
+                writer.append("Best X.........................................................\n");
                 writer.append(arrayToString(X));
                 writer.append("Best Y.........................................................\n");
                 writer.append(arrayToString(Y));

@@ -14,4 +14,6 @@ public class GlobalData {
     public static String newFilePath = "./Doc/data_processing.xlsx";
     public static String outPut = "./Doc/output";
 
+    public static int runTimes = 100;
+
 }
