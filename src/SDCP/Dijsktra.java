@@ -85,7 +85,7 @@ return null;
         return  result;
     }
 
-    public List<int[]> getExtendedPath(double graph[][], int src, int des, int R){
+    public List<int[]> getExtendedPath(double graph[][], int src, int des, double R){
 
         double[][]shortestPathCostMatrix = new double[graph.length][graph[0].length];
         List<List<Integer>> paths = new ArrayList<>();

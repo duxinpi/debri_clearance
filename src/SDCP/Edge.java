@@ -6,7 +6,7 @@ public class Edge {
     public int i;
     public int j;
 
-    private int edgeType; // B, UB, RB, U
+    public String edgeType; // B, UB, RB, U
 
 
 
@@ -33,7 +33,7 @@ public class Edge {
         this.j = j;
     }
 
-    public Edge(int i, int j, double FC_ij, double T, double R, double []W, double []beta) {
+    public Edge(int i, int j, double FC_ij, double T, double R, double []W, double []beta, String edgeType) {
         this.i  = i;
         this.j = j;
         this.FC_ij =FC_ij;
@@ -41,6 +41,7 @@ public class Edge {
         this.R = R;
         this.w_ij = W;
         this.beta=beta;
+        this.edgeType = edgeType;
     }
 
     public int getI(){
@@ -88,4 +89,5 @@ public class Edge {
         return (i <j)? i + "-"+j : j + "-" +i;
 
     }
+
 }

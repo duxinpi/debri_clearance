@@ -8,9 +8,11 @@ import ilog.concert.IloNumVarType;
 import ilog.cplex.IloCplex;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.util.*;
 import java.util.function.DoubleBinaryOperator;
 
+import static SDCP.GlobalData.outPut;
 import static org.junit.Assert.fail;
 
 public class Utility {
@@ -62,6 +64,16 @@ public class Utility {
         System.out.println();
     }
 
+    public static String arrayToString(double[] array) {
+        StringBuilder sb= new StringBuilder();
+            for (double each : array) {
+                sb.append(each + " ");
+            }
+            sb.append("\n");
+        return sb.toString();
+
+    }
+
     public static void printArray(int[] array) {
         for (int each : array) {
             System.out.print(each + " ");
@@ -76,6 +88,17 @@ public class Utility {
             }
             System.out.println();
         }
+    }
+    public static String arrayToString(double[][] array) {
+        StringBuilder builder = new StringBuilder();
+
+        for (int i = 0; i < array.length; i++) {
+            for (int j = 0; j < array[0].length; j++) {
+               builder.append(array[i][j] + "\t");
+            }
+            builder.append("\n");
+        }
+        return builder.toString();
     }
 
     public static boolean Match(List<Edge> array, int m, int n) {
@@ -108,13 +131,30 @@ public class Utility {
         }
         return sum;
     }
-*/
+
+
+
+    public static void test(){
+        try (Writer writer = new BufferedWriter(new OutputStreamWriter(
+                new FileOutputStream(outPut + 1 + ".txt"), "utf-8"))) {
+            writer.write("Best X.........................................................\n");
+            writer.append("Best Y.........................................................\n");
+            writer.append("Best W .........................................................\n");
+            writer.append("Best F .........................................................\n");
+            writer.append("Best S .........................................................\n");
+            writer.append("Best D .........................................................\n");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+    */
 
     public static void main(String ars[]) {
 
+
+    // test();
         // generateParenthesis(3);
-
-
      //   compare("javaA.txt","matlabA.txt", 1512, 378);
      //   compare("javaAeq.txt","matlab_Aeq.txt", 36, 378);
 
@@ -122,6 +162,7 @@ public class Utility {
     //    compare("javab.txt","matlab_b.txt", 1512 );
      //   compare("javaf.txt","matlab_f.txt", 1512 );
     }
+
 
     public static void compare(String file1, String file2, int r, int c) {
         double matlabA[][] = null;
@@ -328,11 +369,11 @@ public class Utility {
     public static Edge getEdge(List<Edge> edges, int i, int j){
         for (Edge each : edges){
             if (each.getJ() == j && each.getI() == i){
-                Edge newEdge = new Edge( i,  j, each.getFC_ij(),  each.getT(), each.getR(), each.w_ij,each.beta);
+                Edge newEdge = new Edge( i,  j, each.getFC_ij(),  each.getT(), each.getR(), each.w_ij,each.beta, each.edgeType);
                 return  newEdge;
             }
             if (each.getI() == j && each.getJ() == i){
-                Edge newEdge = new Edge( i,  j, each.getFC_ij(),  each.getT(), each.getR(), each.w_ij,each.beta);
+                Edge newEdge = new Edge( i,  j, each.getFC_ij(),  each.getT(), each.getR(), each.w_ij,each.beta, each.edgeType);
                 return  newEdge;
             }
         }
@@ -601,7 +642,7 @@ public class Utility {
 
         //1.9
         row = row + N * N;
-        if (GlobalData.policy != 5) {
+        if (GlobalData.policy != 5 && GlobalData.policy != 8 ) {
             for (Node j : observation.getNp()) {
                 for (Node i : observation.getNp()) {
                     A[row + j.getId() - 1][nX + (i.getId() - 1) * N + j.getId() - 1] = i.getLamda(t);
@@ -820,11 +861,19 @@ public class Utility {
 
     public static void printArray(List<Edge> edges) {
         for (Edge edge : edges) {
-
             System.out.print("--" + edge.toString()+" --");
 
         }
         System.out.println();
+    }
+
+    public static String actionString(List<Edge> actions) {
+        StringBuilder sb = new StringBuilder();
+        for (Edge edge : actions) {
+          sb.append("--" + edge.toString());
+
+        }
+       return sb.toString();
     }
 
     public static double getWSum(List<Edge> edges) {
@@ -862,6 +911,16 @@ public class Utility {
         return null;
     }
 
+    public static boolean isDemand(int key, List<Node> nodes) {
+
+        for (int i =0; i < nodes.size(); i++) {
+            if (nodes.get(i).getId() == key) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     public static List<Integer> NeighbourNodes(int id, List<Edge> edges) {
         List<Integer> res = new ArrayList<>();
@@ -880,11 +939,11 @@ public class Utility {
         List<Edge> res = new ArrayList<>();
         for(Edge each: edges) {
             if (each.getI()==id) {
-                Edge newEdge = new Edge( each.i, each.getJ(), each.getFC_ij(),  each.getT(), each.getR(), each.w_ij,each.beta);
+                Edge newEdge = new Edge( each.i, each.getJ(), each.getFC_ij(),  each.getT(), each.getR(), each.w_ij,each.beta, each.edgeType);
                 res.add(newEdge);
             } else if ( each.getJ() == id){
 
-                Edge newEdge = new Edge( each.getJ(), each.getI(), each.getFC_ij(),  each.getT(), each.getR(), each.w_ij,each.beta);
+                Edge newEdge = new Edge( each.getJ(), each.getI(), each.getFC_ij(),  each.getT(), each.getR(), each.w_ij,each.beta, each.edgeType);
                 res.add(newEdge);
             }
         }
@@ -927,6 +986,12 @@ public class Utility {
         return sum ;
 
     }
+
+    public static void copyFile(File source, File dest) throws IOException {
+        Files.copy(source.toPath(), dest.toPath());
+    }
+
+
 
 
 }

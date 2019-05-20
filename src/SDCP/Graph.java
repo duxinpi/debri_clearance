@@ -3,6 +3,7 @@ package SDCP;
 
 import ilog.concert.IloException;
 
+import java.io.*;
 import java.util.*;
 
 import static SDCP.Utility.*;
@@ -20,7 +21,6 @@ public class Graph {
     List<double[]> bestXY = new ArrayList<>();
     double[] bestX = null;
     Set<String> visitedAction = new HashSet<>();
-    Set<String> visitedObservation = new HashSet<>();
 
     List<List<Edge>> B = new ArrayList<>();
     List<List<Edge>> U = new ArrayList<>();
@@ -29,16 +29,29 @@ public class Graph {
     double kt;
     BState bState;
 
+    public void reset() {
+        t = 0;
+        maxV = -1;
+        bestAction = null;
+        bestXY = new ArrayList<>();
+        bestX = null;
+        visitedAction = new HashSet<>();
+    }
 
     public Graph() {
         kt = RC;
 
     }
 
-
     public void initBlocked() {
         B.clear();
-        B.add(E);
+        List<Edge> bEdges = new ArrayList<>();
+        for (Edge edge : E) {
+            if (edge.edgeType.equals("B")) {
+                bEdges.add(edge);
+            }
+        }
+        B.add(bEdges);
         B.add(new ArrayList<>());
         B.add(new ArrayList<>());
         B.add(new ArrayList<>());
@@ -46,12 +59,18 @@ public class Graph {
         B.add(new ArrayList<>());
         B.add(new ArrayList<>());
         B.add(new ArrayList<>());
-
-
     }
+
 
     public void initUnblocked() {
         U.clear();
+        List<Edge> bEdges = new ArrayList<>();
+        for (Edge edge : E) {
+            if (edge.edgeType.equals("U")) {
+                bEdges.add(edge);
+            }
+        }
+        U.add(bEdges);
         U.add(new ArrayList<>());
         U.add(new ArrayList<>());
         U.add(new ArrayList<>());
@@ -202,8 +221,9 @@ public class Graph {
             return getAllFeasibleActions2(t, policy);
         } else if (policy == 7) {
             return getAllFeasibleActions2(t, policy);
+        } else if (policy == 8) {
+            return getAllFeasibleActions2(t, policy);
         }
-
 
         //todo: question, what is our goal? what if the shortest path is cleared completely.
         /*for (int i = allActions.size() - 1; i >= 0; i--) {
@@ -219,8 +239,8 @@ public class Graph {
 
     public List<List<Edge>> getAllFeasibleActions2(int t, int policy) {
         List<List<Edge>> allActions = getAllSequencesShortestPath(t);
-        List<List<Edge>> newAllActions = new ArrayList<>();
-        Map<Integer, Double> idles= new TreeMap<>();
+        Map<String, List<Edge>> newAllActions = new HashMap<>();
+        Map<Integer, Double> idles = new TreeMap<>();
         //todo: question, what is our goal? what if the shortest path is cleared completely.
         for (int i = allActions.size() - 1; i >= 0; i--) {
             List<Edge> eachAction = allActions.get(i);
@@ -234,34 +254,35 @@ public class Graph {
                 double lamda1 = node.getLamda(t);
                 double rightSide = node.getMu() * (node.getR0()[0]);
 
-
                 newAction.add(each);
                 if (B <= 0) {
                     break;
                 }
                 double cost = 1;
-                while (lamda1 > rightSide && cost< B) {
+                while (lamda1 > rightSide && cost < B) {
                     rightSide = node.getMu() * (node.getR0()[0] + Utility.getSumCj(node, cost));
                     cost++;
 
                 }
-                System.out.println("idles : " + B);
+                //           System.out.println("idles : " + B);
                 idles.put(key, B);
                 B = B - cost;
             }
 
-            newAllActions.add(newAction);
+            newAllActions.put(Utility.actionString(newAction), newAction);
             System.out.println("Actions: ");
             Utility.printArray(newAction);
         }
 
-        if (policy == 6) {
+        List<List<Edge>> actionList = new ArrayList<>(newAllActions.values());
+
+        if (policy == 6 || policy == 8) {
             List<List<Edge>> actionP6 = new ArrayList<>();
             int numberOfActions = 2;
             for (Integer key : idles.keySet()) {
-                actionP6.add(newAllActions.get(key));
+                actionP6.add(actionList.get(key));
                 System.out.println("!~Actions: ");
-                Utility.printArray(newAllActions.get(key));
+                Utility.printArray(actionList.get(key));
                 numberOfActions--;
                 if (numberOfActions == 0) break;
             }
@@ -270,17 +291,17 @@ public class Graph {
 
 
         if (policy == 7) {
-            for(int i =0; i < newAllActions.size(); i++) {
-                List<Edge> each = newAllActions.get(i);
-                while(each.size()>2) {
-                    each.remove(each.size()-1);
+
+            for (List<Edge> each : newAllActions.values()) {
+                while (each.size() > 2) {
+                    each.remove(each.size() - 1);
                 }
             }
-            return newAllActions;
+            return new ArrayList<>(newAllActions.values());
         }
         //   System.out.println("action size: " + newAllActions.size());
         // System.exit(0);
-        return newAllActions;
+        return new ArrayList<>(newAllActions.values());
     }
 
     public List<Edge> getObservation(List<Edge> action, int t) {
@@ -364,13 +385,7 @@ public class Graph {
         return result;
     }
 
-
-
-
 /*
-
-
-
     public List<Observation> getAllObservations(List<Edge> action, int t) {
         // observation is supposed to contain only w_i_j, but here I use edges, it's easier to find w_ij and beta of the corresponding w_ij.
         List<Observation> result = new ArrayList<>();
@@ -465,11 +480,8 @@ public class Graph {
         }
         result += z;
         System.out.println("-------get v------:  " + Math.abs(result));
-
-
         return result;
     }
-
 
 
 /*
@@ -622,23 +634,33 @@ public class Graph {
         return result;
     }
 
+    public void initFile() {
+        File newFile = new File(newFilePath);
+        newFile.delete();
+        try {
+            Utility.copyFile(new File(OriginFilePath), newFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     public void initGraph() {
         N = new ArrayList<>();
         E = new ArrayList<>();
-        List<List<String>> nodes = ExcelReader.read("./Doc/data.xlsx", 0);
-        List<List<String>> edges = ExcelReader.read("./Doc/data.xlsx", 1);
-        List<List<String>> globalData = ExcelReader.read("./Doc/data.xlsx", 2);
+        List<List<String>> nodes = ExcelReader.read(newFilePath, 0);
+        List<List<String>> edges = ExcelReader.read(newFilePath, 1);
+        List<List<String>> globalData = ExcelReader.read(newFilePath, 2);
 
         nodes.remove(0);
         edges.remove(0);
-
+        GlobalData.B = Double.parseDouble(globalData.get(0).get(1));
 
         for (List<String> eachNode : nodes) {
 
             Node node = new Node(Integer.parseInt(eachNode.get(0)), eachNode.get(1), Double.parseDouble(eachNode.get(2)), Double.parseDouble(eachNode.get(3)), Double.parseDouble(eachNode.get(4)), Double.parseDouble(eachNode.get(5)), Double.parseDouble(eachNode.get(6)), Double.parseDouble(eachNode.get(7)));
 
-            double[] R0 = new double[30];
+            double[] R0 = new double[(int) GlobalData.B];
             for (int i = 0; i < R0.length; i++) {
                 R0[i] = Double.parseDouble(eachNode.get(i + 8));
             }
@@ -649,12 +671,11 @@ public class Graph {
 
 
         for (List<String> eachEdge : edges) {
-            E.add(new Edge(Integer.parseInt(eachEdge.get(0)), Integer.parseInt(eachEdge.get(1)), Double.parseDouble(eachEdge.get(2)), Double.parseDouble(eachEdge.get(3)), Double.parseDouble(eachEdge.get(4)), new double[]{Double.parseDouble(eachEdge.get(5)), Double.parseDouble(eachEdge.get(6))}, new double[]{Double.parseDouble(eachEdge.get(7)), Double.parseDouble(eachEdge.get(8))}));
-
+            E.add(new Edge(Integer.parseInt(eachEdge.get(0)), Integer.parseInt(eachEdge.get(1)), Double.parseDouble(eachEdge.get(2)), Double.parseDouble(eachEdge.get(3)), Double.parseDouble(eachEdge.get(4)), new double[]{Double.parseDouble(eachEdge.get(5)), Double.parseDouble(eachEdge.get(6))}, new double[]{Double.parseDouble(eachEdge.get(7)), Double.parseDouble(eachEdge.get(8))}, eachEdge.get(9)));
         }
 
-        GlobalData.B = Double.parseDouble(globalData.get(0).get(1));
-        GlobalData.RC = Integer.parseInt(globalData.get(1).get(1));
+
+        GlobalData.RC = Double.parseDouble(globalData.get(1).get(1));
         GlobalData.SIGMA = Double.parseDouble(globalData.get(2).get(1));
         GlobalData.policy = Integer.parseInt(globalData.get(3).get(1));
         GlobalData.lookAhead = Integer.parseInt(globalData.get(4).get(1));
@@ -1546,12 +1567,9 @@ Tij
             each.Yt.put(t, each.getYt(0));
         }
     }*/
-    int testCount = 0;
-
     public double getV(int curr, Graph graph, int steps, int policy) {
 
         if (curr == steps) {
-            System.out.println("recursive : " + testCount);
             return 0;
         }
         List<List<Edge>> actions = graph.getAllFeasibleActions(t, policy);
@@ -1578,7 +1596,6 @@ Tij
                 System.out.println("observation size:  " + observatons.size());
                 for (Observation eachObservation : observatons) {
 
-                    System.out.println("testcount " + testCount++);
 
                     // System.out.println("observation " + c++);
                     if (visitedAction.contains(Utility.getString(eachAction) + "~" + eachObservation.toString()))
@@ -1630,75 +1647,146 @@ Tij
     }
 
 
+    public void updateRCAfterAction(List<Edge> bestAction) {
+        double cost = Utility.getWSum(bestAction);
+        RC = Math.max(0, RC - cost);
+        kt = RC;
+    }
+
+
     public static void main(String args[]) {
         System.out.print("Run program ...");
+
         Graph graph = new Graph();
+        graph.initFile();
         //graph.initNodes();
         // graph.initEdges();
-        graph.initGraph();
-        graph.initBlocked();
-        graph.initUnblocked();
-        graph.initRB();
-        graph.initUB();
-        long t_start = System.currentTimeMillis();
-        System.out.println(System.currentTimeMillis());
-        System.out.print("test .........................................................");
-
-        //  System.out.print("test ...:"+ graph.getBenefit(0));
+        List<List<Edge>> bestActions = new ArrayList<>();
 
 
-        double v = graph.getV(0, graph, lookAhead, policy);
-        List<Edge> action = graph.bestAction;
-        System.out.print("BEST ACTION: ");
-        for (Edge edge : action) {
-            System.out.println(edge.getI() + "----" + edge.getJ());
-        }
+        for (int i = 0; i < 12; i++) {
 
-        System.out.println("BEST ACTION value: " + graph.maxV);
-        int N = graph.N.size();
-        int nX = 0;
-        int nY = N * N;
-        int nW = nY + (int) Utility.getSum(graph.getCj()); // what it is.
-        int nS = nW + nY;
-        int nD = nS + N;
-        int nF = nD + N;
-        int nK = nF + nY;
-        int nKn = nK + N;
+            graph.initGraph();
+            graph.initBlocked();
+            graph.initUnblocked();
+            graph.initRB();
+            graph.initUB();
+            long t_start = System.currentTimeMillis();
+            System.out.println(System.currentTimeMillis());
+            System.out.print("....................Start Run.....................................");
+            //  System.out.print("test ...:"+ graph.getBenefit(0));
+            double v = graph.getV(0, graph, lookAhead, policy);
+            List<Edge> action = graph.bestAction;
+            if (action == null) break;
 
-        //   System.out.print("Best X, Y .........................................................");
-        //   Utility.printArray(graph.bestX);
-        double X[][] = Matrix.transpose(Matrix.reshape(graph.bestX, 0, nY, N));
-        double Y[][] = null;
-        double[] Cj = graph.getCj();
-        if (unique(Cj).length == 1) {
-            //      System.out.println(nW);
-            //        System.out.println(nY +1 -1);
 
-            Y = Matrix.transpose(Matrix.reshape(graph.bestX, nY + 1 - 1, nW + 1, (int) Utility.max(Cj)));
-        } else {
-            //Y = subarray(xDouble, nY +1 -1, nW+1);
-        }
+            int N = graph.N.size();
+            int nX = 0;
+            int nY = N * N;
+            int nW = nY + (int) Utility.getSum(graph.getCj()); // what it is.
+            int nS = nW + nY;
+            int nD = nS + N;
+            int nF = nD + N;
+            int nK = nF + nY;
+            int nKn = nK + N;
 
-        System.out.print("Best X, Y .........................................................");
-        System.out.print("Best X.........................................................");
-        Utility.printDoubleArray(X);
+            //   System.out.print("Best X, Y .........................................................");
+            //   Utility.printArray(graph.bestX);
+            double X[][] = Matrix.transpose(Matrix.reshape(graph.bestX, 0, nY, N));
+            double Y[][] = null;
+            double[] Cj = graph.getCj();
+            if (unique(Cj).length == 1) {
+                //      System.out.println(nW);
+                //        System.out.println(nY +1 -1);
+                Y = Matrix.transpose(Matrix.reshape(graph.bestX, nY + 1 - 1, nW + 1, (int) Utility.max(Cj)));
+            } else {
+                //Y = subarray(xDouble, nY +1 -1, nW+1);
+            }
+            double W[] = subarray(graph.bestX, nW + 1 - 1, nS);
+            double F[][] = Matrix.transpose(Matrix.reshape(graph.bestX, nF + 1 - 1, nK + 1, N));
+            double S[] = subarray(graph.bestX, nS + 1 - 1, nD);
+            double D[] = subarray(graph.bestX, nD + 1 - 1, nF);
 
-        System.out.print("Best Y .........................................................");
-        Utility.printDoubleArray(Y);
-        System.out.print("Best W .........................................................");
-        double W[] = subarray(graph.bestX, nW + 1 - 1, nS);
-        Utility.printArray(W);
 
-        //    System.out.println(" ---  all actions: " + graph.getAllSequences(graph.E));
-        //  System.out.println(graph.getAllFeasibleActions(0).size());
+            System.out.print("~Best Action: ");
+            for (Edge edge : action) {
+                System.out.println(edge.getI() + "----" + edge.getJ());
+            }
+            System.out.println("~Best Action value: " + graph.maxV);
+
+
+            System.out.print("Best X.........................................................");
+            Utility.printDoubleArray(X);
+            System.out.print("Best Y .........................................................");
+            Utility.printDoubleArray(Y);
+            System.out.print("Best W .........................................................");
+            Utility.printArray(W);
+            System.out.print("Best F .........................................................");
+            Utility.printDoubleArray(F);
+            System.out.print("Best S .........................................................");
+            Utility.printArray(S);
+            System.out.print("Best D .........................................................");
+            Utility.printArray(D);
+
+
+            try (Writer writer = new BufferedWriter(new OutputStreamWriter(
+                    new FileOutputStream(outPut + i + ".txt"), "utf-8"))) {
+                writer.write("Best X.........................................................\n");
+
+
+                for (Edge edge : action) {
+                    writer.append(edge.getI() + "----" + edge.getJ() + "\n");
+                }
+                writer.append(arrayToString(X));
+                writer.append("Best Y.........................................................\n");
+                writer.append(arrayToString(Y));
+                writer.append("Best W .........................................................\n");
+                writer.append(arrayToString(W));
+                writer.append("Best F .........................................................\n");
+                writer.append( arrayToString(F));
+                writer.append("Best S .........................................................\n");
+                writer.append( arrayToString(S));
+                writer.append("Best D .........................................................\n");
+                writer.append(arrayToString(D));
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            //    System.out.println(" ---  all actions: " + graph.getAllSequences(graph.E));
+            //  System.out.println(graph.getAllFeasibleActions(0).size());
         /*  try {
           //  System.out.print("test ...:"+ graph.getBenefit(0));
+
+ testvp, p value: 0.16000000000000003
+testvp, v value: -1.415043042096
+testvp, p value: 0.16000000000000003
+testvp, v value: -0.38967935253312
+Best Action: 6----7
+7----11
+11----13
+13----14
+14----22
+Best Action value: 1.8040828638080002
             graph.getBenefit(0);
         } catch (IloException e) {
             e.printStackTrace();
         }*/
-        long t_end = System.currentTimeMillis();
-        System.out.println("xdu: cost: " + (t_end - t_start));
+            long t_end = System.currentTimeMillis();
+            System.out.println("xdu: cost: " + (t_end - t_start));
+            bestActions.add(graph.bestAction);
+            ExcelReader.write(newFilePath, graph.bestAction);
+            graph.reset();
+
+        }
+        System.out.println("best action: ");
+        for (int i = 0; i < bestActions.size(); i++) {
+
+            System.out.println(" " + i + ": ");
+            Utility.printArray(bestActions.get(i));
+        }
+
+        //System.out.println("xdu: cost: " + (t_end - t_start));
 
     }
 
