@@ -133,7 +133,7 @@ public class ExcelReader {
                     List<String> eachRow = originData.get(i).get(k);
 
                     if (i == 0) { // table 1.
-                        if (k !=0 ) {
+                        if (k !=0&& GlobalData.updateYt!=0 ) {
                             eachRow.set(6, ""+bestY[k-1]);
                         }
                         for (int j = 0; j < nodes.size(); j++) {

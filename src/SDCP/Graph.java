@@ -682,6 +682,7 @@ public class Graph {
         GlobalData.policy = Integer.parseInt(globalData.get(3).get(1));
         GlobalData.lookAhead = Integer.parseInt(globalData.get(4).get(1));
         GlobalData.runTimes = Integer.parseInt(globalData.get(5).get(1));
+        GlobalData.updateYt = Integer.parseInt(globalData.get(6).get(1));
 
         kt = RC;
 
