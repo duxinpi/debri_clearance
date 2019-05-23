@@ -65,11 +65,11 @@ public class Utility {
     }
 
     public static String arrayToString(double[] array) {
-        StringBuilder sb= new StringBuilder();
-            for (double each : array) {
-                sb.append(each + " ");
-            }
-            sb.append("\n");
+        StringBuilder sb = new StringBuilder();
+        for (double each : array) {
+            sb.append(each + " ");
+        }
+        sb.append("\n");
         return sb.toString();
 
     }
@@ -89,12 +89,13 @@ public class Utility {
             System.out.println();
         }
     }
+
     public static String arrayToString(double[][] array) {
         StringBuilder builder = new StringBuilder();
 
         for (int i = 0; i < array.length; i++) {
             for (int j = 0; j < array[0].length; j++) {
-               builder.append(array[i][j] + "\t");
+                builder.append(array[i][j] + "\t");
             }
             builder.append("\n");
         }
@@ -114,10 +115,10 @@ public class Utility {
     }
 
     public static double getSum(double[][] array) {
-        double sum =0;
+        double sum = 0;
         for (int i = 0; i < array.length; i++) {
             for (int j = 0; j < array[0].length; j++) {
-                sum+= array[i][j];
+                sum += array[i][j];
             }
 
         }
@@ -153,14 +154,14 @@ public class Utility {
     public static void main(String ars[]) {
 
 
-    // test();
+        // test();
         // generateParenthesis(3);
-     //   compare("javaA.txt","matlabA.txt", 1512, 378);
-     //   compare("javaAeq.txt","matlab_Aeq.txt", 36, 378);
+        //   compare("javaA.txt","matlabA.txt", 1512, 378);
+        //   compare("javaAeq.txt","matlab_Aeq.txt", 36, 378);
 
-    //    compare("javabeq.txt","matlab_beq.txt", 1512 );
-    //    compare("javab.txt","matlab_b.txt", 1512 );
-     //   compare("javaf.txt","matlab_f.txt", 1512 );
+        //    compare("javabeq.txt","matlab_beq.txt", 1512 );
+        //    compare("javab.txt","matlab_b.txt", 1512 );
+        //   compare("javaf.txt","matlab_f.txt", 1512 );
     }
 
 
@@ -173,10 +174,10 @@ public class Utility {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        for (int i =0; i < matlabA.length; i++) {
-            for (int j =0; j < matlabA[0].length; j++) {
-                if (Math.abs(matlabA[i][j]- javaA[i][j]) >0.01){
-                    System.out.println("file: " + file1 + "diff: " + i + "-----" + j + " : " + matlabA[i][j] +"----java---" + javaA[i][j]);
+        for (int i = 0; i < matlabA.length; i++) {
+            for (int j = 0; j < matlabA[0].length; j++) {
+                if (Math.abs(matlabA[i][j] - javaA[i][j]) > 0.01) {
+                    System.out.println("file: " + file1 + "diff: " + i + "-----" + j + " : " + matlabA[i][j] + "----java---" + javaA[i][j]);
                 }
             }
         }
@@ -191,11 +192,11 @@ public class Utility {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        for (int i =0; i < matlabA.length; i++) {
+        for (int i = 0; i < matlabA.length; i++) {
 
-                if (Math.abs(matlabA[i]- javaA[i]) >0.000000000001){
-                    System.out.println("file: " + file1 + "=====diff: " + i + "----- : " + matlabA[i] +"----java---" + javaA[i]);
-                }
+            if (Math.abs(matlabA[i] - javaA[i]) > 0.000000000001) {
+                System.out.println("file: " + file1 + "=====diff: " + i + "----- : " + matlabA[i] + "----java---" + javaA[i]);
+            }
 
         }
     }
@@ -208,7 +209,7 @@ public class Utility {
                 writer.print(array[i][j]);
                 writer.print("\t");
                 if (array[i][j] != 0) {
-             //       System.out.println(i + "-----" + j + " : " + array[i][j]);
+                    //       System.out.println(i + "-----" + j + " : " + array[i][j]);
                 }
             }
             writer.println();
@@ -220,11 +221,11 @@ public class Utility {
     public static void writeFile(String filePath, double[] array) throws IOException {
         PrintWriter writer = new PrintWriter(filePath, "UTF-8");
         for (int i = 0; i < array.length; i++) {
-                writer.print(array[i]);
-                writer.print("\t");
-                if (array[i] != 0) {
-                 //   System.out.println(i + "-----" + array[i]);
-                }
+            writer.print(array[i]);
+            writer.print("\t");
+            if (array[i] != 0) {
+                //   System.out.println(i + "-----" + array[i]);
+            }
             writer.println();
 
         }
@@ -248,7 +249,7 @@ public class Utility {
             for (int i = 0; i < line.length; i++) {
                 result[row][i] = Double.valueOf(line[i]);
                 if (result[row][i] != 0) {
-          //          System.out.println(row + "-----" + i + " : " + result[row][i]);
+                    //          System.out.println(row + "-----" + i + " : " + result[row][i]);
 
                 }
             }
@@ -267,18 +268,18 @@ public class Utility {
 
         String st;
         double[] result = new double[r];
-        int i =0;
+        int i = 0;
 
         while ((st = br.readLine()) != null) {
 
 
-                result[i] = Double.valueOf(st);
-                if (result[i] != 0) {
-                    //          System.out.println(row + "-----" + i + " : " + result[row][i]);
+            result[i] = Double.valueOf(st);
+            if (result[i] != 0) {
+                //          System.out.println(row + "-----" + i + " : " + result[row][i]);
 
-                }
-                i++;
             }
+            i++;
+        }
         return result;
     }
 
@@ -288,7 +289,7 @@ public class Utility {
             set.add(each);
         }
         double r[] = new double[set.size()];
-        int i =0;
+        int i = 0;
         for (Double each : set) {
             r[i++] = each;
         }
@@ -296,8 +297,8 @@ public class Utility {
     }
 
     public static double max(double c[]) {
-        double max=0;
-        for (Double each : c){
+        double max = 0;
+        for (Double each : c) {
             if (each > max) {
                 max = each;
             }
@@ -306,9 +307,9 @@ public class Utility {
         return max;
     }
 
-    public static double[] subarray(double x[], int i , int j) {
-        double[] r = new double[j-i];
-        for (int k =0; k < r.length; k++) {
+    public static double[] subarray(double x[], int i, int j) {
+        double[] r = new double[j - i];
+        for (int k = 0; k < r.length; k++) {
             r[k] = x[i++];
         }
         return r;
@@ -327,8 +328,8 @@ public class Utility {
     }
 
     public static boolean isSupply(int i, List<Node> nodes) {
-        for(Node each : nodes) {
-            if (each.getId() == i && each.getType().equals("s")){
+        for (Node each : nodes) {
+            if (each.getId() == i && each.getType().equals("s")) {
                 return true;
             }
         }
@@ -346,7 +347,7 @@ public class Utility {
 
     public static List<Edge> exclude(List<Edge> edgeSet, List<Edge> subset) {
         List<Edge> result = new ArrayList<>();
-        for(Edge each: edgeSet) {
+        for (Edge each : edgeSet) {
             if (!contains(subset, each)) {
                 result.add(each);
             }
@@ -355,36 +356,36 @@ public class Utility {
     }
 
     public static boolean contains(List<Edge> edgeSet, Edge edge) {
-        for (Edge each: edgeSet) {
-            if (each.getI() == edge.getI() && each.getJ() == edge.getJ()){
+        for (Edge each : edgeSet) {
+            if (each.getI() == edge.getI() && each.getJ() == edge.getJ()) {
                 return true;
             }
-            if (each.getJ() == edge.getI() && each.getI() == edge.getJ()){
+            if (each.getJ() == edge.getI() && each.getI() == edge.getJ()) {
                 return true;
             }
         }
         return false;
     }
 
-    public static Edge getEdge(List<Edge> edges, int i, int j){
-        for (Edge each : edges){
-            if (each.getJ() == j && each.getI() == i){
-                Edge newEdge = new Edge( i,  j, each.getFC_ij(),  each.getT(), each.getR(), each.w_ij,each.beta, each.edgeType);
-                return  newEdge;
+    public static Edge getEdge(List<Edge> edges, int i, int j) {
+        for (Edge each : edges) {
+            if (each.getJ() == j && each.getI() == i) {
+                Edge newEdge = new Edge(i, j, each.getFC_ij(), each.getT(), each.getR(), each.w_ij, each.beta, each.edgeType);
+                return newEdge;
             }
-            if (each.getI() == j && each.getJ() == i){
-                Edge newEdge = new Edge( i,  j, each.getFC_ij(),  each.getT(), each.getR(), each.w_ij,each.beta, each.edgeType);
-                return  newEdge;
+            if (each.getI() == j && each.getJ() == i) {
+                Edge newEdge = new Edge(i, j, each.getFC_ij(), each.getT(), each.getR(), each.w_ij, each.beta, each.edgeType);
+                return newEdge;
             }
         }
         return null;
     }
 
-    public static boolean isAdjcent(Edge a, Edge b){
-        if (a.getJ() == b.getJ() && a.getI() == b.getI()){
+    public static boolean isAdjcent(Edge a, Edge b) {
+        if (a.getJ() == b.getJ() && a.getI() == b.getI()) {
             return false;
         }
-        if (a.getJ() == b.getI() && a.getI() == b.getJ()){
+        if (a.getJ() == b.getI() && a.getI() == b.getJ()) {
             return false;
         }
 
@@ -392,7 +393,7 @@ public class Utility {
     }
 
 
-    public static double getZ(Graph graph, int t, Observation observation, List<double[]> bestX ) throws IloException {
+    public static double getZ(Graph graph, int t, Observation observation, List<double[]> bestRes) throws IloException {
 
         int N = graph.getNsize();
         int nX = 0;
@@ -440,16 +441,16 @@ public class Utility {
 
                 f[nX + (i.getId() - 1) * N + j.getId() - 1] = i.getLamda(t) * graph.getPeriodT()[i.getId() - 1][j.getId() - 1];
                 f[nW + (i.getId() - 1) * N + j.getId() - 1] = GlobalData.SIGMA * graph.getR()[i.getId() - 1][j.getId() - 1];
-                tempForLog1.add(   f[nX + (i.getId() - 1) * N + j.getId() - 1]);
-                tempForLog2.add(   f[nW + (i.getId() - 1) * N + j.getId() - 1]);
+                tempForLog1.add(f[nX + (i.getId() - 1) * N + j.getId() - 1]);
+                tempForLog2.add(f[nW + (i.getId() - 1) * N + j.getId() - 1]);
             }
 
         }
 
-       // printArray(f);
+        // printArray(f);
         // 1.2
         int row = 0;
-      //  System.out.println("1.2-----------------");
+        //  System.out.println("1.2-----------------");
         // row 1, 7
         for (Node i : graph.getNd()) {
 
@@ -475,8 +476,7 @@ public class Utility {
         //1.4
 
 
-
-       row += graph.getNsize();
+        row += graph.getNsize();
 
         for (Node i : graph.getNT()) {
 
@@ -566,25 +566,25 @@ public class Utility {
                     A[row + i.getId() - 1][nF + (j.getId() - 1) * N + i.getId() - 1] = -1;
                 }
             }
-            b[row + i.getId() - 1] = observation.bState.RS_t[i.getId()-1];
-         //   System.out.println("---rs------" + observation.bState.RS_t[i.getId()-1]);
+            b[row + i.getId() - 1] = observation.bState.RS_t[i.getId() - 1];
+            //   System.out.println("---rs------" + observation.bState.RS_t[i.getId()-1]);
         }
 
-      //  System.out.println("1.5-----------");
+        //  System.out.println("1.5-----------");
         //1.5
         row = row + N;
-       for (Node i : graph.getNd()) {
+        for (Node i : graph.getNd()) {
             A[row + i.getId() - 1][nK + i.getId() - 1] = 1;
             //     System.out.println("line number: row + i.getId() - 1 positive: " + (row + i.getId() - 1));
             b[row + i.getId() - 1] = i.getRd(t);
-         //   System.out.println("---- RD: " + i.getRd(t));
+            //   System.out.println("---- RD: " + i.getRd(t));
         }
 
 
         //1.6
 
         row += N;
-    //    System.out.println("1.6--------------");
+        //    System.out.println("1.6--------------");
         for (Node j : observation.getNp()) {
             double temp = 0;
             for (Node i : graph.getN()) {
@@ -607,7 +607,7 @@ public class Utility {
         // 1.7
         row += N * N;
         //row 1.7
-      //  System.out.println("1.7---------------");
+        //  System.out.println("1.7---------------");
         for (Node j : observation.getNp()) {
             for (int m = 2; m <= Cj[j.getId() - 1]; m++) {
                 if (j.getId() > 1) {
@@ -625,7 +625,7 @@ public class Utility {
 
 
         // 1.8
-     //   System.out.println("1.8---------------");
+        //   System.out.println("1.8---------------");
         row += getSum(Cj);
         for (Node i : observation.getNp()) {
             for (Node j : observation.getNp()) {
@@ -642,7 +642,7 @@ public class Utility {
 
         //1.9
         row = row + N * N;
-        if (GlobalData.policy != 5 && GlobalData.policy != 8 ) {
+        if (GlobalData.policy != 5 && GlobalData.policy != 8) {
             for (Node j : observation.getNp()) {
                 for (Node i : observation.getNp()) {
                     A[row + j.getId() - 1][nX + (i.getId() - 1) * N + j.getId() - 1] = i.getLamda(t);
@@ -676,7 +676,7 @@ public class Utility {
                     A[row + j.getId() - 1][nY + m - 1] = 1;
                 }
             }
-            b[row + j.getId() - 1] = j.getYt(t);
+            b[row + j.getId() - 1] = j.getYt();
         }
         // 1.14
 
@@ -690,7 +690,7 @@ public class Utility {
                     A[row + j.getId() - 1][nY + m - 1] = -1;
                 }
             }
-            b[row + j.getId() - 1] = -j.getYt(t);
+            b[row + j.getId() - 1] = -j.getYt();
         }
 
         IloCplex model = null;
@@ -704,7 +704,7 @@ public class Utility {
 
         IloNumVar[] x = new IloNumVar[f.length];
 
-      /*  try {
+        /*  try {
          *//*   writeFile("javaA.txt", A);
             writeFile("javaAeq.txt", Aeq);
             writeFile("javab.txt", b);
@@ -720,10 +720,9 @@ public class Utility {
         try {
             // init our min expression
             for (int i = 0; i < f.length; i++) {
-                if (Ctype[i] == 'C'){
+                if (Ctype[i] == 'C') {
                     x[i] = model.semiContVar(0, Double.MAX_VALUE, IloNumVarType.Float);
-                }
-                else if (Ctype[i] == 'B'){
+                } else if (Ctype[i] == 'B') {
                     x[i] = model.boolVar();
                 } else {
 
@@ -789,56 +788,56 @@ public class Utility {
 
             if (model.solve()) {
 
-           //     System.out.println("obj = " + model.getObjValue());
+                //     System.out.println("obj = " + model.getObjValue());
 
             }
 
-       //     System.out.println("Complete");
-            double []xDouble = new double[x.length];
-            for (int i =0; i < xDouble.length; i++) {
+            //     System.out.println("Complete");
+            double[] xDouble = new double[x.length];
+            for (int i = 0; i < xDouble.length; i++) {
                 xDouble[i] = model.getValue(x[i]);
 
             }
 
-            bestX.add(0, xDouble);
+            bestRes.add(0, xDouble);
 
-            if(bestX.size()> 1) {
-                bestX.remove(1);
+            if (bestRes.size() > 1) {
+                bestRes.remove(1);
             }
             double X[][] = Matrix.transpose(Matrix.reshape(xDouble, 0, nY, N));
             printDoubleArray(X);
-            double [][]Y = null;
+            double[][] Y = null;
 
-            if (unique(Cj).length ==1) {
-          //      System.out.println(nW);
-        //        System.out.println(nY +1 -1);
+            if (unique(Cj).length == 1) {
+                //      System.out.println(nW);
+                //        System.out.println(nY +1 -1);
 
-                Y = Matrix.transpose(Matrix.reshape(xDouble, nY +1 -1, nW+1,(int)Utility.max(Cj)));
+                Y = Matrix.transpose(Matrix.reshape(xDouble, nY + 1 - 1, nW + 1, (int) Utility.max(Cj)));
             } else {
                 //Y = subarray(xDouble, nY +1 -1, nW+1);
             }
 
-            double W[] = subarray(xDouble, nW+1 -1, nS);
-            double S[] = subarray(xDouble, nS+1 -1, nD );
-            double D[] = subarray(xDouble, nD +1 -1, nF );
-            double F[][] =  Matrix.transpose(Matrix.reshape(xDouble, nF +1 -1, nK+1,N));
+            double W[] = subarray(xDouble, nW + 1 - 1, nS);
+            double S[] = subarray(xDouble, nS + 1 - 1, nD);
+            double D[] = subarray(xDouble, nD + 1 - 1, nF);
+            double F[][] = Matrix.transpose(Matrix.reshape(xDouble, nF + 1 - 1, nK + 1, N));
             printDoubleArray(F);
-            double K[] = subarray(xDouble, nK +1-1, xDouble.length);  // ki.
+            double K[] = subarray(xDouble, nK + 1 - 1, xDouble.length);  // ki.
             System.out.println("----k 0-" + K[0]);
             System.out.println("----k 7-" + K[6]);
             System.out.println("----bi-" + graph.getBiArray()[0]);
-            System.out.println("----bi-" + graph.getBiArray()[7-1]);
+            System.out.println("----bi-" + graph.getBiArray()[7 - 1]);
 
             observation.K = K;
 
 
-         //   graph.updateRD( t+1,  K);
-         //   graph.updateRS(observation, t+1, F);
+            //   graph.updateRD( t+1,  K);
+            //   graph.updateRS(observation, t+1, F);
 
-           // System.out.println("time t : " +t);
+            // System.out.println("time t : " +t);
 
-         //   BState s0 = new BState(t,graph.getbeta(t, level) , 0, graph.getRS(t), graph.getRD(t));
-         //   StateManager.getInstance().put(t, s0 );
+            //   BState s0 = new BState(t,graph.getbeta(t, level) , 0, graph.getRS(t), graph.getRD(t));
+            //   StateManager.getInstance().put(t, s0 );
           /*  try {
                 writeFile("javaW.txt", W);
                 writeFile("javaS.txt", S);
@@ -861,7 +860,7 @@ public class Utility {
 
     public static void printArray(List<Edge> edges) {
         for (Edge edge : edges) {
-            System.out.print("--" + edge.toString()+" --");
+            System.out.print("--" + edge.toString() + " --");
 
         }
         System.out.println();
@@ -870,17 +869,17 @@ public class Utility {
     public static String actionString(List<Edge> actions) {
         StringBuilder sb = new StringBuilder();
         for (Edge edge : actions) {
-          sb.append("--" + edge.toString());
+            sb.append("--" + edge.toString());
 
         }
-       return sb.toString();
+        return sb.toString();
     }
 
     public static double getWSum(List<Edge> edges) {
         double res = 0;
         for (Edge each : edges) {
             double min = Double.MAX_VALUE;
-            for (Double eachW : each.w_ij){
+            for (Double eachW : each.w_ij) {
                 min = Math.min(eachW, min);
             }
             res += min;
@@ -903,7 +902,7 @@ public class Utility {
 
     public static Node getNode(int key, List<Node> node) {
 
-        for (int i =0; i < node.size(); i++) {
+        for (int i = 0; i < node.size(); i++) {
             if (node.get(i).getId() == key) {
                 return node.get(i);
             }
@@ -913,7 +912,7 @@ public class Utility {
 
     public static boolean isDemand(int key, List<Node> nodes) {
 
-        for (int i =0; i < nodes.size(); i++) {
+        for (int i = 0; i < nodes.size(); i++) {
             if (nodes.get(i).getId() == key) {
                 return true;
             }
@@ -924,10 +923,10 @@ public class Utility {
 
     public static List<Integer> NeighbourNodes(int id, List<Edge> edges) {
         List<Integer> res = new ArrayList<>();
-        for(Edge each: edges) {
-            if (each.getJ() == id ) {
+        for (Edge each : edges) {
+            if (each.getJ() == id) {
                 res.add(each.getI());
-            }else if (each.getI() == id) {
+            } else if (each.getI() == id) {
                 res.add(each.getJ());
             }
         }
@@ -937,13 +936,13 @@ public class Utility {
 
     public static List<Edge> getNeighbours(int id, List<Edge> edges) {
         List<Edge> res = new ArrayList<>();
-        for(Edge each: edges) {
-            if (each.getI()==id) {
-                Edge newEdge = new Edge( each.i, each.getJ(), each.getFC_ij(),  each.getT(), each.getR(), each.w_ij,each.beta, each.edgeType);
+        for (Edge each : edges) {
+            if (each.getI() == id) {
+                Edge newEdge = new Edge(each.i, each.getJ(), each.getFC_ij(), each.getT(), each.getR(), each.w_ij, each.beta, each.edgeType);
                 res.add(newEdge);
-            } else if ( each.getJ() == id){
+            } else if (each.getJ() == id) {
 
-                Edge newEdge = new Edge( each.getJ(), each.getI(), each.getFC_ij(),  each.getT(), each.getR(), each.w_ij,each.beta, each.edgeType);
+                Edge newEdge = new Edge(each.getJ(), each.getI(), each.getFC_ij(), each.getT(), each.getR(), each.w_ij, each.beta, each.edgeType);
                 res.add(newEdge);
             }
         }
@@ -951,47 +950,52 @@ public class Utility {
     }
 
 
-
-
     public static void getAllSequences(List<Edge> edges, List<Edge> current, List<List<Edge>> result, int k) {
         if (k == current.size()) {
-            return ;
+            return;
         }
-        for (int i =0; i < current.size();i++) {
+        for (int i = 0; i < current.size(); i++) {
             Edge e = current.get(i);
             edges.add(e);
             result.add(new ArrayList<>(edges));
-            getAllSequences(edges, current, result,  k+1);
+            getAllSequences(edges, current, result, k + 1);
             edges.remove(e);
         }
-        return ;
+        return;
     }
 
-    public static String getString(List<Edge> edges){
+    public static String getString(List<Edge> edges) {
         StringBuilder sb = new StringBuilder();
         for (Edge each : edges) {
-            sb.append(each.getI() +"-" + each.getJ());
+            sb.append(each.getI() + "-" + each.getJ());
         }
         return sb.toString();
     }
 
 
     public static double getSumCj(Node node, double B) {
-        double[]R0 = node.getR0();
-        double sum =0;
+        double[] R0 = node.getR0();
+        double sum = 0;
 
-        for (int i =1; i< B; i++) {
-            sum += (R0[i] - R0[i-1]);
+        for (int i = 1; i < B; i++) {
+            sum += (R0[i] - R0[i - 1]);
         }
-        return sum ;
+        return sum;
 
+    }
+
+    public static double[] getAssginmentYt(double[][] bestY) {
+        double[] res = new double[bestY.length];
+        for (int i = 0; i < res.length; i++) {
+            res[i] = getSum(bestY[i]);
+        }
+
+        return res;
     }
 
     public static void copyFile(File source, File dest) throws IOException {
         Files.copy(source.toPath(), dest.toPath());
     }
-
-
 
 
 }

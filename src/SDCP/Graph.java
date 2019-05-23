@@ -18,9 +18,10 @@ public class Graph {
 
     double maxV = -1;
     List<Edge> bestAction = null;
-    List<double[]> bestXY = new ArrayList<>();
-    double[] bestX = null;
+    List<double[]> bestRes = new ArrayList<>();
+    double[] bestObjValue = null;
     Set<String> visitedAction = new HashSet<>();
+    double[][] bestY = null;
 
     List<List<Edge>> B = new ArrayList<>();
     List<List<Edge>> U = new ArrayList<>();
@@ -33,8 +34,9 @@ public class Graph {
         t = 0;
         maxV = -1;
         bestAction = null;
-        bestXY = new ArrayList<>();
-        bestX = null;
+        bestRes = new ArrayList<>();
+        bestObjValue = null;
+        bestY = null;
         visitedAction = new HashSet<>();
     }
 
@@ -463,14 +465,14 @@ public class Graph {
         return sum;
     }
 
-    public double getReward(Observation observation, int t, List<double[]> bestXY) throws IloException {
+    public double getReward(Observation observation, int t, List<double[]> bestRes) throws IloException {
         double bi[] = getBiArray();
         System.out.println("compute Z---action is: ");
         Utility.printArray(observation.action);
         System.out.println("---observation is: ");
         Utility.printArray(observation.observation);
         double z = 0;
-        z = getZ(this, t, observation, bestXY);
+        z = getZ(this, t, observation, bestRes);
         System.out.println("-------get Z ------:  " + z);
 
         double result = 0;
@@ -1557,17 +1559,15 @@ Tij
         return max;
     }
 */
+
  /*   public void updateLamda(int t) {
         for (Node each : N) {
             each.lamda.put(t, each.getLamda(0));
         }
     }
+    */
 
-    public void updateYt(int t) {
-        for (Node each : N) {
-            each.Yt.put(t, each.getYt(0));
-        }
-    }*/
+
     public double getV(int curr, Graph graph, int steps, int policy) {
 
         if (curr == steps) {
@@ -1603,7 +1603,7 @@ Tij
                         continue;
                     visitedAction.add(Utility.getString(eachAction) + "~" + eachObservation.toString());
                     double p = graph.getPofObservation(eachObservation);
-                    double z = graph.getReward(eachObservation, t, bestXY);
+                    double z = graph.getReward(eachObservation, t, bestRes);
 
 
                     bState = new BState(eachAction, eachObservation);
@@ -1631,7 +1631,7 @@ Tij
                         this.bestAction = eachAction;
                         System.out.println("~~found best action ~");
                         Utility.printArray(bestAction);
-                        bestX = bestXY.get(0);
+                        bestObjValue = bestRes.get(0);
                         maxV = Math.abs(v);
 
                     }
@@ -1693,21 +1693,21 @@ Tij
 
             //   System.out.print("Best X, Y .........................................................");
             //   Utility.printArray(graph.bestX);
-            double X[][] = Matrix.transpose(Matrix.reshape(graph.bestX, 0, nY, N));
+            double X[][] = Matrix.transpose(Matrix.reshape(graph.bestObjValue, 0, nY, N));
             double Y[][] = null;
             double[] Cj = graph.getCj();
             if (unique(Cj).length == 1) {
                 //      System.out.println(nW);
                 //        System.out.println(nY +1 -1);
-                Y = Matrix.transpose(Matrix.reshape(graph.bestX, nY + 1 - 1, nW + 1, (int) Utility.max(Cj)));
+                Y = Matrix.transpose(Matrix.reshape(graph.bestObjValue, nY + 1 - 1, nW + 1, (int) Utility.max(Cj)));
             } else {
                 //Y = subarray(xDouble, nY +1 -1, nW+1);
             }
-            double W[] = subarray(graph.bestX, nW + 1 - 1, nS);
-            double F[][] = Matrix.transpose(Matrix.reshape(graph.bestX, nF + 1 - 1, nK + 1, N));
-            double S[] = subarray(graph.bestX, nS + 1 - 1, nD);
-            double D[] = subarray(graph.bestX, nD + 1 - 1, nF);
-
+            double W[] = subarray(graph.bestObjValue, nW + 1 - 1, nS);
+            double F[][] = Matrix.transpose(Matrix.reshape(graph.bestObjValue, nF + 1 - 1, nK + 1, N));
+            double S[] = subarray(graph.bestObjValue, nS + 1 - 1, nD);
+            double D[] = subarray(graph.bestObjValue, nD + 1 - 1, nF);
+            graph.bestY = Y;
 
             System.out.print("~Best Action: ");
             for (Edge edge : action) {
@@ -1777,7 +1777,8 @@ Best Action value: 1.8040828638080002
             long t_end = System.currentTimeMillis();
             System.out.println("xdu: cost: " + (t_end - t_start));
             bestActions.add(graph.bestAction);
-            ExcelReader.write(newFilePath, graph.bestAction);
+            double [] res = Utility.getAssginmentYt(graph.bestY);
+            ExcelReader.write(newFilePath, graph.bestAction, res);
             graph.reset();
 
         }

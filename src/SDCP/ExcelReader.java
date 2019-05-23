@@ -116,7 +116,7 @@ public class ExcelReader {
         return res;
     }
 
-    public static boolean write(String path, List<Edge> bestAction) {
+    public static boolean write(String path, List<Edge> bestAction, double[] bestY) {
         List<List<List<String>>> originData = read(path);
         List<Integer> nodes = Utility.getNodeIndex(bestAction);
         if (nodes.size() == 0) return false;
@@ -129,9 +129,13 @@ public class ExcelReader {
                 XSSFSheet sheet = workbook.createSheet("Sheet" + i);
                 int rowNum = 0;
                 System.out.println("Creating excel");
-                for (int k = 0;k < originData.get(i).size();k++) {
+                for (int k = 0;k < originData.get(i).size();k++) {// k is row index.
                     List<String> eachRow = originData.get(i).get(k);
+
                     if (i == 0) { // table 1.
+                        if (k !=0 ) {
+                            eachRow.set(6, ""+bestY[k-1]);
+                        }
                         for (int j = 0; j < nodes.size(); j++) {
                             if (k != 0 && Integer.parseInt(eachRow.get(0)) == nodes.get(j) && eachRow.get(1).equals("d")) {
                                 eachRow.set(1, "t"); // node type
@@ -193,7 +197,7 @@ public class ExcelReader {
 
     public static void main(String args[]) {
 
-        write("./Doc/test_data.xlsx", null);
+        write("./Doc/test_data.xlsx", null, null);
 /*
         List<List<String>> nodes = read("./Doc/data.xlsx", 0);
         List<List<String>>  edges = read("./Doc/data.xlsx", 1);

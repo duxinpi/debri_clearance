@@ -11,7 +11,7 @@ public class Node {
 
     private String type; //1 s, , 2 t, 3 d
 
-    public Map<Integer, Double> Yt = new HashMap<>();
+    double Yt;
     public Map<Integer, Double> RS = new HashMap<>();
     public Map<Integer, Double> RD = new HashMap<>();
     public Map<Integer, Double> lamda = new HashMap<>(); // arrival rate at nFode.
@@ -45,7 +45,7 @@ public class Node {
         this.RD.put(4,RD); // TODO: need to update RS and RD.
         this.mu = mu;
         this.lamda.put(0, lamda);
-        this.Yt.put(0, Yt);
+        this.Yt = Yt;
         this.B = B;
     }
 
@@ -113,8 +113,8 @@ public class Node {
         return R0;
     }
 
-    public double getYt(int t) {
-        return Yt.get(0);
+    public double getYt() {
+        return Yt;
     }
 
 
