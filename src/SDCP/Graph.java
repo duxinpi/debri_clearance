@@ -1605,7 +1605,7 @@ Tij
                     visitedAction.add(Utility.getString(eachAction) + "~" + eachObservation.toString());
                     double p = graph.getPofObservation(eachObservation);
                     double z = graph.getReward(eachObservation, t, bestRes);
-
+                    double [] objectArray = Arrays.copyOf(bestRes.get(0), bestRes.get(0).length);
 
                     bState = new BState(eachAction, eachObservation);
                     eachObservation.bState = bState;
@@ -1632,7 +1632,7 @@ Tij
                         this.bestAction = eachAction;
                         System.out.println("~~found best action ~");
                         Utility.printArray(bestAction);
-                        bestObjValue = bestRes.get(0);
+                        bestObjValue = objectArray;
                         maxV = Math.abs(v);
 
                     }
