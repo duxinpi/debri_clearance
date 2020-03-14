@@ -224,6 +224,9 @@ public class ExcelReader {
             edgeList.add(new Edge(Integer.parseInt(eachEdge.get(0)), Integer.parseInt(eachEdge.get(1)), Double.parseDouble(eachEdge.get(2)),  Double.parseDouble(eachEdge.get(3)), Double.parseDouble(eachEdge.get(4)), new double[]{Double.parseDouble(eachEdge.get(5)), Double.parseDouble(eachEdge.get(6))}, new double[]{Double.parseDouble(eachEdge.get(7)), Double.parseDouble(eachEdge.get(8))}));
 
         }
+
+ 0:
+--23-24 ----22-23 ----14-22 ----24-25 --
 */
         //   Edge edge12 = new Edge(1, 2, 100, 0.94, 0.04, new double[]{0.3, 0.5}, new double[]{0.5, 0.5});
     }

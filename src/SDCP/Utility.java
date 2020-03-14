@@ -419,8 +419,13 @@ public class Utility {
         //todo: need to verify.
 
         double[] Cj = graph.getCj();
-        int rowsNumAb = N + N + N + N * ((int) Utility.getSum(Cj) - Cj.length) + N * N + N + N + N;
 
+
+
+       // int rowsNumAb = N + N + N + N * ((int) Utility.getSum(Cj) - Cj.length) + N * N + N + N + N ;
+        int rowsNumAb = N + N + N + N * ((int) Utility.getSum(Cj) - Cj.length) + N * N + N + N + N + N*N;
+        System.out.println("row num: " + rowsNumAb);
+        System.out.println("nkn: " + nKn);
         double[][] A = new double[rowsNumAb][nKn];
         double[] b = new double[rowsNumAb];
         int rowsNumAeq = N + N + 1 + N + N + N;
@@ -691,6 +696,21 @@ public class Utility {
                 }
             }
             b[row + j.getId() - 1] = -j.getYt();
+        }
+    // 1.20
+
+        row += N;
+        for (Node i : observation.getNp()) {
+            for (Node j : graph.getN()) {
+                if (Match(observation.getUprime(), i.getId(), j.getId())) {
+                    A[row + (j.getId() - 1 - 1) * N + i.getId() - 1][nF + (i.getId() - 1) * N + j.getId() - 1] = 1;
+                }
+                if (Match(observation.getUprime(), j.getId(), i.getId())) {
+
+                    A[row + (j.getId() - 1 - 1) * N + i.getId() - 1][nF + (j.getId() - 1) * N + i.getId() - 1] = -1;
+                }
+                b[row + (j.getId() - 1 - 1) * N + (i.getId() - 1)] = graph.getFC()[i.getId() - 1][j.getId() - 1];
+            }
         }
 
         IloCplex model = null;
@@ -967,7 +987,7 @@ public class Utility {
     public static String getString(List<Edge> edges) {
         StringBuilder sb = new StringBuilder();
         for (Edge each : edges) {
-            sb.append(each.getI() + "-" + each.getJ());
+            sb.append(each.getI() + "-" + each.getJ()+",");
         }
         return sb.toString();
     }

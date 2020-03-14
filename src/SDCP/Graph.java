@@ -126,6 +126,7 @@ public class Graph {
     }
 
     public List<List<Edge>> getAllSequencesShortestPath(int t) {
+        System.out.println("remaining RC : " + RC);
         List<Edge> remain = B.get(t);
         List<List<Edge>> actions = new ArrayList<>();
         dijsktra = new Dijsktra(N.size());
@@ -152,10 +153,13 @@ public class Graph {
                     Edge edge = Utility.getEdge(remain, each[0] + 1, each[1] + 1);
                     if (edge != null)
                         action.add(edge);
+                    if (action.size() > 0) {
+                        actions.add(new ArrayList<>(action));
+                    }
                 }
-                if (action.size() > 0) {
-                    actions.add(action);
-                }
+         //       if (action.size() > 0) {
+         //           actions.add(action);
+          //      }
             }
         }
 
@@ -240,7 +244,11 @@ public class Graph {
 
 
     public List<List<Edge>> getAllFeasibleActions2(int t, int policy) {
+
+        System.out.println("xdu : get all feasible action");
         List<List<Edge>> allActions = getAllSequencesShortestPath(t);
+
+        System.out.println("xdu : get  feasible action : " + allActions.size());
         Map<String, List<Edge>> newAllActions = new HashMap<>();
         Map<Integer, Double> idles = new TreeMap<>();
         //todo: question, what is our goal? what if the shortest path is cleared completely.
@@ -335,19 +343,30 @@ public class Graph {
 
     public Map<String, Observation> getAllObservations(List<Edge> action, List<Edge> UB, List<Edge> U, int t) {
         Map<String, Observation> result = new HashMap<>();
-        if (policy == 1 || policy == 3) {
+        if (policy == 1 || policy == 3)  {
             List<List<Edge>> allCombinations = new ArrayList<>();
             List<Edge> edges = new ArrayList<>();
-            getAllSequences(edges, action, allCombinations, 0);
+         //   getAllSequences(edges, action, allCombinations, 0);
 
-            for (int i = 0; i < allCombinations.size(); i++) {
-                List<Edge> each = allCombinations.get(i);
-                if (each.size() == 0) continue;
-                List<Edge> observation = getObservation(each, t);
-                BState bState = new BState(t, B.get(t), RC, getRS(t), getRD(t), kt, N);
-                Observation observationObj = new Observation(observation, action, bState, E, N, t);
-                result.put(observationObj.toString(), observationObj);
-            }
+       //     for (int i = 0; i < allCombinations.size(); i++) {
+         //       List<Edge> each = allCombinations.get(i);
+                List<Edge> each = action;
+                if (each.size() == 0) return result;
+                List<Edge> observationSet = getObservation(each, t);
+                List<Edge> tempEdges = new ArrayList<>();
+                List<List<Edge>> allCombinationForObservation = new ArrayList<>();
+                dfs(tempEdges,observationSet,allCombinationForObservation, observationSet.size(), 0);
+
+
+                for (List<Edge> eachObservation : allCombinationForObservation){
+                    if (getWSum(eachObservation) <= RC) {
+                        BState bState = new BState(t, B.get(t), RC, getRS(t), getRD(t), kt, N);
+                        Observation observationObj = new Observation(eachObservation, action, bState, E, N, t);
+                        result.put(observationObj.toString(), observationObj);
+                    }
+                }
+
+      //      }
             return result;
         }
         List<Integer> nodes = Utility.getNodeIndex(action);
@@ -367,6 +386,9 @@ public class Graph {
                     max = eachEdge.getWmin();
                 }
             }
+            if (each == 20 || each == 21) {
+                System.out.println("here");
+            }
             if (min == Integer.MAX_VALUE) {
                 break;
             }
@@ -374,14 +396,20 @@ public class Graph {
             bState = new BState(t, B.get(t), RC, getRS(t), getRD(t), kt, N);
             List<Edge> obEdges = new ArrayList<>();
             obEdges.add(minEdge);
-            Observation observationObj = new Observation(obEdges, action, bState, E, N, t);
-            result.put(observationObj.toString(), observationObj);
+
+            if (getWSum(obEdges) <= RC) {
+                Observation observationObj = new Observation(obEdges, action, bState, E, N, t);
+                result.put(observationObj.toString(), observationObj);
+            }
             if (minEdge != maxEdge) {
                 bState = new BState(t, B.get(t), RC, getRS(t), getRD(t), kt, N);
                 List<Edge> obEdges2 = new ArrayList<>();
+                if (getWSum(obEdges2) <= RC) {
                 obEdges2.add(maxEdge);
                 Observation observationObj2 = new Observation(obEdges2, action, bState, E, N, t);
-                result.put(observationObj2.toString(), observationObj2);
+
+                    result.put(observationObj2.toString(), observationObj2);
+                }
             }
         }
         return result;
@@ -456,12 +484,14 @@ public class Graph {
     public double getPofObservation(Observation observation) {
         double sum = 1;
         for (Edge edge : observation.observation) {
+            System.out.print(edge.i + "~" + edge.j + ", ");
             for (int i = 0; i < levels; i++) {
                 if (edge.beta[i] > 0) {
                     sum *= edge.beta[i];
                 }
             }
         }
+
         return sum;
     }
 
@@ -671,8 +701,10 @@ public class Graph {
             N.add(node);
         }
 
-
+        int c =0;
+        System.out.println("~" +edges.size());
         for (List<String> eachEdge : edges) {
+            System.out.println(c++);
             E.add(new Edge(Integer.parseInt(eachEdge.get(0)), Integer.parseInt(eachEdge.get(1)), Double.parseDouble(eachEdge.get(2)), Double.parseDouble(eachEdge.get(3)), Double.parseDouble(eachEdge.get(4)), new double[]{Double.parseDouble(eachEdge.get(5)), Double.parseDouble(eachEdge.get(6))}, new double[]{Double.parseDouble(eachEdge.get(7)), Double.parseDouble(eachEdge.get(8))}, eachEdge.get(9)));
         }
 
@@ -1391,17 +1423,17 @@ Tij
             }
             return sum;
         }*/
-    public void getAllSequences(List<Edge> edges, List<Edge> current, List<List<Edge>> result, int k) {
-        if (k == current.size()) {
-            return;
+
+    public void dfs(List<Edge> temp, List<Edge> edgeSet, List<List<Edge>> res, int k, int start) {
+
+        res.add(new ArrayList<>(temp));
+
+        for (int i = start; i <edgeSet.size(); i++) {
+            System.out.print("start" + k);
+            temp.add(edgeSet.get(i));
+            dfs(temp, edgeSet,res, k-1,   i+1);
+            temp.remove(temp.size() -1);
         }
-
-        Edge e = current.get(k);
-        edges.add(e);
-        result.add(new ArrayList<>(edges));
-        getAllSequences(edges, current, result, k + 1);
-        edges.remove(e);
-
     }
 
     public void findSequences(List<Edge> current, List<Edge> remain, List<List<Edge>> result) {
@@ -1572,9 +1604,12 @@ Tij
     public double getV(int curr, Graph graph, int steps, int policy) {
 
         if (curr == steps) {
+            System.out.println("~step0 ");
             return 0;
         }
+        System.out.println("~Best get :  ");
         List<List<Edge>> actions = graph.getAllFeasibleActions(t, policy);
+        System.out.println("~Best actions :  ");
         int a = 0;
         double maxV1 = 0;
         double maxV2 = 0;
@@ -1584,8 +1619,17 @@ Tij
 // TODO 1: 1. store X, Y, W, Done.
 // TODO 2: read csv Done.
 // TODO 3: 2nd equations.
-
+        Set<String> visited = new HashSet<>();
+        int test = 2;
         for (List<Edge> eachAction : actions) {
+            if (Utility.contains(eachAction, new Edge(17,18))&& Utility.contains(eachAction, new Edge(18,20))&& Utility.contains(eachAction, new Edge(20,19))&&t == 1) {
+                test = 3;
+            }
+            String actionString = Utility.getString(eachAction);
+            if (visited.contains(actionString)){
+                continue;
+            }
+            visited.add(actionString);
             System.out.println("action " + a++);
 
             if (actions == null) continue;
@@ -1595,18 +1639,17 @@ Tij
                 Map<String, Observation> map = graph.getAllObservations(eachAction, graph.UB.get(t), graph.U.get(t), t);
                 List<Observation> observatons = new ArrayList<>(map.values());
                 if (observatons.size() == 0) continue;
-                System.out.println("observation size:  " + observatons.size());
+
                 for (Observation eachObservation : observatons) {
-
-
                     // System.out.println("observation " + c++);
                     if (visitedAction.contains(Utility.getString(eachAction) + "~" + eachObservation.toString()))
                         continue;
                     visitedAction.add(Utility.getString(eachAction) + "~" + eachObservation.toString());
-                    double p = graph.getPofObservation(eachObservation);
+                    double p = graph.getPofObservation(eachObservation); // probability of observing observing different resource requirement level on edge  based on belief at start of time
                     double z = graph.getReward(eachObservation, t, bestRes);
                     double [] objectArray = Arrays.copyOf(bestRes.get(0), bestRes.get(0).length);
 
+                    String currentObservation  = eachObservation.toString();
                     bState = new BState(eachAction, eachObservation);
                     eachObservation.bState = bState;
                     eachObservation.update();
@@ -1618,10 +1661,15 @@ Tij
                     BState tempState = graph.bState;
                     graph.bState = eachObservation.bState;
                     t = t + 1;
-                    v = p * (z + getV(curr + 1, graph, steps, policy));
-
-                    System.out.println("testvp, p value: " + p);
-                    System.out.println("testvp, v value: " + v);
+                    double nextLevelt= getV(curr + 1, graph, steps, policy);
+                    v = p * (z + nextLevelt);
+                    System.out.println("action is: " + Utility.getString(eachAction) + " at time t" + t);
+                    System.out.println("observation : " +currentObservation);
+                    System.out.println("reward: " + z);
+                    System.out.println("time t: " + t);
+                    System.out.println("v t+1 : " + nextLevelt);
+                    System.out.println("testvp, p value: " + p);// testvp, p value: 1.650722342445733E-5
+                    System.out.println("testvp, v value: " + v);//testvp, v value: 0.09820149378929033
                     t = t - 1;
                     graph.B.set(t + 1, new ArrayList<>());
                     graph.UB.set(t + 1, new ArrayList<>());
@@ -1634,11 +1682,8 @@ Tij
                         Utility.printArray(bestAction);
                         bestObjValue = objectArray;
                         maxV = Math.abs(v);
-
                     }
                 }
-
-
             } catch (IloException e) {
                 e.printStackTrace();
             }
@@ -1647,6 +1692,7 @@ Tij
 
         return maxV;
     }
+
 
 
     public void updateRCAfterAction(List<Edge> bestAction) {
@@ -1661,13 +1707,19 @@ Tij
 
         Graph graph = new Graph();
         graph.initFile();
-        //graph.initNodes();
-        // graph.initEdges();
+
         List<List<Edge>> bestActions = new ArrayList<>();
+        for (int i =0; i < 100; i++) {
+            File file = new File((outPut + i+".txt"));
+            if (file.exists()) {
+                file.delete();
+
+            }
+        }
 
 
         for (int i = 0; i < runTimes; i++) {
-
+            System.out.print("....................Start Run....---------------.................................------------------" + runTimes);
             graph.initGraph();
             graph.initBlocked();
             graph.initUnblocked();
@@ -1678,6 +1730,7 @@ Tij
             System.out.print("....................Start Run.....................................");
             //  System.out.print("test ...:"+ graph.getBenefit(0));
             double v = graph.getV(0, graph, lookAhead, policy);
+            System.out.println("~Best 1: ");
             List<Edge> action = graph.bestAction;
             if (action == null) break;
 
@@ -1691,12 +1744,13 @@ Tij
             int nF = nD + N;
             int nK = nF + nY;
             int nKn = nK + N;
-
+            System.out.print("~Best 2: ");
             //   System.out.print("Best X, Y .........................................................");
             //   Utility.printArray(graph.bestX);
             double X[][] = Matrix.transpose(Matrix.reshape(graph.bestObjValue, 0, nY, N));
             double Y[][] = null;
             double[] Cj = graph.getCj();
+            System.out.print("~Best 1: ");
             if (unique(Cj).length == 1) {
                 //      System.out.println(nW);
                 //        System.out.println(nY +1 -1);
@@ -1708,6 +1762,7 @@ Tij
             double F[][] = Matrix.transpose(Matrix.reshape(graph.bestObjValue, nF + 1 - 1, nK + 1, N));
             double S[] = subarray(graph.bestObjValue, nS + 1 - 1, nD);
             double D[] = subarray(graph.bestObjValue, nD + 1 - 1, nF);
+            double K[] = subarray(graph.bestObjValue, nK + 1 - 1, graph.bestObjValue.length);
             graph.bestY = Y;
 
             System.out.print("~Best Action: ");
@@ -1729,7 +1784,8 @@ Tij
             Utility.printArray(S);
             System.out.print("Best D .........................................................");
             Utility.printArray(D);
-
+            System.out.print("Best K .........................................................");
+            Utility.printArray(K);
 
             try (Writer writer = new BufferedWriter(new OutputStreamWriter(
                     new FileOutputStream(outPut + i + ".txt"), "utf-8"))) {
@@ -1751,8 +1807,13 @@ Tij
                 writer.append( arrayToString(S));
                 writer.append("Best D .........................................................\n");
                 writer.append(arrayToString(D));
+                writer.append("Best K .........................................................\n");
+                writer.append(arrayToString(K));
+                writer.append("Objective function value.........................................................\n");
+                writer.append(String.valueOf(v));
 
             } catch (IOException e) {
+                System.out.println("there is exception");
                 e.printStackTrace();
             }
 

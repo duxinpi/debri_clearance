@@ -10,7 +10,7 @@ public class GlobalData {
     public static int policy = 1;
     public static int lookAhead= 4;
     public static int Cj = 10;
-    public static String OriginFilePath = "./Doc/data.xlsx";
+    public static String OriginFilePath = "./Doc/data-policy1.xlsx";
     public static String newFilePath = "./Doc/data_processing.xlsx";
     public static String outPut = "./Doc/output";
 
